@@ -16,6 +16,7 @@ async function startServer() {
 
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
+      configFile: path.resolve(process.cwd(), 'frontend/vite.config.js'),
       server: { middlewareMode: true },
       appType: 'spa',
     });

@@ -1,10 +1,11 @@
 import express from 'express';
-import { createServer as createViteServer } from 'vite';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { initDb } from './server/database.js';
+import { initDb } from './src/database.js';
+
+import fs from 'fs';
 
 // Load env vars
 dotenv.config();
@@ -28,11 +29,11 @@ async function startServer() {
   app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
   // Import Routes
-  const { authRoutes } = await import('./server/routes/auth.routes.js');
-  const { productRoutes } = await import('./server/routes/product.routes.js');
-  const { cartRoutes } = await import('./server/routes/cart.routes.js');
-  const { orderRoutes } = await import('./server/routes/order.routes.js');
-  const { adminRoutes } = await import('./server/routes/admin.routes.js');
+  const { authRoutes } = await import('./src/routes/auth.routes.js');
+  const { productRoutes } = await import('./src/routes/product.routes.js');
+  const { cartRoutes } = await import('./src/routes/cart.routes.js');
+  const { orderRoutes } = await import('./src/routes/order.routes.js');
+  const { adminRoutes } = await import('./src/routes/admin.routes.js');
 
   // API Routes
   app.use('/api/auth', authRoutes);
@@ -46,15 +47,9 @@ async function startServer() {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
-  // Vite integration
-  if (process.env.NODE_ENV !== 'production') {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(__dirname, 'dist');
+  // Serve static frontend if in same project (fallback)
+  const distPath = path.join(__dirname, 'dist');
+  if (fs.existsSync(distPath)) {
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
@@ -62,7 +57,7 @@ async function startServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`🚀 API Server running on port ${PORT}`);
   });
 }
 

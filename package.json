@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node server.js",
+    "dev": "node backend/server.js",
     "build": "vite build",
-    "start": "node server.js",
+    "start": "node backend/server.js",
     "lint": "eslint ."
   },
   "dependencies": {

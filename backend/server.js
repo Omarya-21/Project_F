@@ -1,60 +1,37 @@
 import express from 'express';
-import cors from 'cors';
-import db from './db.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { createServer as createViteServer } from 'vite';
+import backendApp from './app.js';
 
-const app = express();
-app.use(cors());
-app.use(express.json());
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// API Routes
-app.get('/api/products', (req, res) => {
-  try {
-    const rows = db.prepare('SELECT * FROM products').all();
-    res.json(rows);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Database error' });
-  }
-});
+async function startServer() {
+  const app = express();
+  const PORT = 3000;
 
-app.post('/api/products', (req, res) => {
-  const { name, price, stock, category } = req.body;
-  try {
-    const info = db.prepare(
-      'INSERT INTO products (name, price, stock, category) VALUES (?, ?, ?, ?)'
-    ).run(name, price, stock, category);
-    
-    res.status(201).json({ 
-      id: info.lastInsertRowid, 
-      name, 
-      price, 
-      stock, 
-      category 
+  // Mount backend API routes
+  app.use(backendApp);
+
+  if (process.env.NODE_ENV !== 'production') {
+    const vite = await createViteServer({
+      server: { middlewareMode: true },
+      appType: 'spa',
     });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Database error' });
+    app.use(vite.middlewares);
+  } else {
+    // In production, serve the built frontend
+    const distPath = path.join(process.cwd(), 'dist');
+    app.use(express.static(distPath));
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(distPath, 'index.html'));
+    });
   }
-});
 
-// Initialization (Create table if not exists)
-const init = () => {
-  try {
-    db.exec(`
-      CREATE TABLE IF NOT EXISTS products (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        price REAL NOT NULL,
-        stock INTEGER NOT NULL,
-        category TEXT
-      )
-    `);
-    console.log('Database initialized');
-  } catch (err) {
-    console.error('Initialization error:', err);
-  }
-};
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+  });
+}
 
-init();
-
-export default app;
+startServer();

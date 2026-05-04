@@ -21,7 +21,8 @@ A high-performance e-commerce platform for computer hardware, built with a moder
 - **File Uploads**: Multer
 
 ## Project Structure
-- `/src`: Frontend source code (Components, Pages, Hooks).
-- `/server`: Backend server logic (API Routes, Database).
-- `/index.html`: Main HTML entry point.
-- `/package.json`: Project dependencies and automation scripts.
+- `/src`: Unified application source code.
+- `/src/server`: Backend Express server and SQLite database logic.
+- `/index.html`: Web application entry point.
+- `/package.json`: Project manifest and scripts.
+- `/vite.config.js`: Vite build and proxy configuration.

@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node backend/index.js",
-    "build": "cd client && npm run build",
-    "start": "node backend/index.js",
+    "dev": "node server/index.js",
+    "build": "vite build",
+    "start": "node server/index.js",
     "lint": "eslint ."
   },
   "dependencies": {
@@ -33,7 +33,12 @@
     "vite": "^6.2.3"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "autoprefixer": "^10.4.21",
+    "eslint": "^10.3.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.6.0",
     "tailwindcss": "^4.1.14",
     "vite": "^6.2.3"
   }

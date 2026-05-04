@@ -1,0 +1,6 @@
+/* OrdersAdmin.css */
+.logistics-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}

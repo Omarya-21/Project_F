@@ -1,0 +1,4 @@
+/* ProductsAdmin.css */
+.admin-table-row:last-child {
+    border-bottom: none;
+}

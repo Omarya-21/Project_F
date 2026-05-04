@@ -6,6 +6,7 @@ import { ShoppingCart, ArrowLeft, Shield, Truck, Zap, Package } from 'lucide-rea
 import { useCart } from '../context/CartContext';
 import { formatPrice } from '../utils/formatPrice';
 import Loader from '../components/Loader';
+import '../styles/ProductDetails.css';
 
 export default function ProductDetails() {
   const { id } = useParams();

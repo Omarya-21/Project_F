@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { getProducts } from '../services/productService';
 import ProductCard from '../components/ProductCard';
 import { motion } from 'framer-motion';
+import '../styles/Products.css';
 
 export default function Products() {
   const [products, setProducts] = useState([]);

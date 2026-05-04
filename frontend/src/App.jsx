@@ -5,9 +5,16 @@ import Home from './pages/Home';
 import Products from './pages/Products';
 import ProductDetails from './pages/ProductDetails';
 import Cart from './pages/Cart';
+import Checkout from './pages/Checkout';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
+import Orders from './pages/Orders';
+import NotFound from './pages/NotFound';
+import Dashboard from './admin/Dashboard';
+import ProductsAdmin from './admin/ProductsAdmin';
+import UsersAdmin from './admin/UsersAdmin';
+import OrdersAdmin from './admin/OrdersAdmin';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
@@ -32,15 +39,40 @@ export default function App() {
                     <Profile />
                   </ProtectedRoute>
                 } />
-                <Route path="/checkout" element={
+                <Route path="/orders" element={
                   <ProtectedRoute>
-                    <div className="pt-40 text-center">
-                      <h2 className="text-4xl font-black mb-4 uppercase tracking-[0.2em] text-blue-600 italic">Checkout Sequence</h2>
-                      <p className="text-gray-500">Processing transactional data packet...</p>
-                    </div>
+                    <Orders />
                   </ProtectedRoute>
                 } />
-                <Route path="*" element={<div className="pt-40 text-center text-red-500 font-black text-8xl italic">404</div>} />
+                <Route path="/checkout" element={
+                  <ProtectedRoute>
+                    <Checkout />
+                  </ProtectedRoute>
+                } />
+                
+                {/* Admin Routes */}
+                <Route path="/admin" element={
+                  <ProtectedRoute adminOnly={true}>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/products" element={
+                  <ProtectedRoute adminOnly={true}>
+                    <ProductsAdmin />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/users" element={
+                  <ProtectedRoute adminOnly={true}>
+                    <UsersAdmin />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/orders" element={
+                  <ProtectedRoute adminOnly={true}>
+                    <OrdersAdmin />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
             <Footer />

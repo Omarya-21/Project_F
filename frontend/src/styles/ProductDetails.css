@@ -1,0 +1,5 @@
+/* ProductDetails.css */
+.product-image-glass {
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
+    backdrop-filter: blur(10px);
+}

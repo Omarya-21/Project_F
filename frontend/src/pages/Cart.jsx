@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Trash2, Plus, Minus, ArrowRight, ShoppingBag, Package } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { formatPrice } from '../utils/formatPrice';
+import '../styles/Cart.css';
 
 export default function Cart() {
   const { cart, removeFromCart, updateQuantity, subtotal } = useCart();

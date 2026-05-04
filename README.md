@@ -1,20 +1,35 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Nexus Hardware - E-Commerce Platform
 
-# Run and deploy your AI Studio app
+A high-performance e-commerce platform for computer hardware, built with a modern full-stack architecture.
 
-This contains everything you need to run your app locally.
+## Tech Stack
 
-View your app in AI Studio: https://ai.studio/apps/7a63e9b2-d81f-48c0-a50f-8a5f023a1fcf
+### Frontend
+- **Framework**: React 19
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS & Framer Motion (for animations)
+- **State Management**: React Context API
+- **Charts**: Recharts
+- **Icons**: Lucide React
 
-## Run Locally
+### Backend
+- **Runtime**: Node.js
+- **Framework**: Express.js
+- **Database**: SQLite (SQL-based storage)
+- **Authentication**: JWT (JSON Web Tokens) with Bcrypt password hashing
+- **File Uploads**: Multer
 
-**Prerequisites:**  Node.js
+## Features
+- **Global Inventory**: Real-time stock tracking and management.
+- **Admin Dashboard**: Comprehensive analytics, order registry, and hardware catalog control.
+- **User Experience**: Smooth transitions, responsive design, and secure checkout flow.
+- **Security**: Protected admin routes and encrypted user credentials.
 
+## Environment Variables
+Refer to `.env.example` for the required configuration. Key variables include:
+- `JWT_SECRET`: Security salt for authentication.
+- `VITE_API_URL`: Backend endpoint for the frontend client.
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Project Structure
+- `/client`: Frontend source code and assets.
+- `/backend`: Server logic, API routes, and database configuration.

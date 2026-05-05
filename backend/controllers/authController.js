@@ -11,10 +11,15 @@ export const register = async (req, res) => {
     if (existingUser) return res.status(400).json({ message: 'User already exists' });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const userId = UserModel.createUser(name, email, hashedPassword);
     
-    const token = jwt.sign({ id: userId, role: 'user' }, JWT_SECRET, { expiresIn: '24h' });
-    res.status(201).json({ token, user: { id: userId, name, email, role: 'user' } });
+    // Check if any users exist
+    const userCount = UserModel.db.prepare('SELECT COUNT(*) as count FROM users').get().count;
+    const role = userCount === 0 ? 'admin' : 'user';
+    
+    const userId = UserModel.createUser(name, email, hashedPassword, role);
+    
+    const token = jwt.sign({ id: userId, role }, JWT_SECRET, { expiresIn: '24h' });
+    res.status(201).json({ token, user: { id: userId, name, email, role } });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

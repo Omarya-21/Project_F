@@ -1,9 +1,10 @@
 import db from '../config/db.js';
+export { db };
 
-export const createUser = (name, email, password) => {
+export const createUser = (name, email, password, role = 'user') => {
   const info = db.prepare(
-    'INSERT INTO users (name, email, password) VALUES (?, ?, ?)'
-  ).run(name, email, password);
+    'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)'
+  ).run(name, email, password, role);
   return info.lastInsertRowid;
 };
 

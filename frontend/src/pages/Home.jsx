@@ -20,7 +20,7 @@ export default function Home() {
           transition={{ delay: 0.1 }}
           className="text-gray-400 text-lg md:text-xl max-w-2xl mb-10"
         >
-          Premium components for elite builders. Experience performance without compromise with Nexus PC parts.
+          Premium components for elite builders. Experience performance without compromise with Omar's PC parts.
         </motion.p>
         <motion.div
            initial={{ opacity: 0, scale: 0.9 }}

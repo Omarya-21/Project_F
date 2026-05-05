@@ -2,8 +2,10 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import AIAssistant from './components/AIAssistant';
+import CookieBanner from './components/CookieBanner';
 import Home from './pages/Home';
 import Products from './pages/Products';
+import CategoryProducts from './pages/CategoryProducts';
 import ProductDetails from './pages/ProductDetails';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
@@ -11,6 +13,9 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Orders from './pages/Orders';
+import Contact from './pages/Contact';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
 import NotFound from './pages/NotFound';
 import Dashboard from './admin/Dashboard';
 import ProductsAdmin from './admin/ProductsAdmin';
@@ -31,7 +36,11 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/products" element={<Products />} />
+                <Route path="/category/:categoryName" element={<CategoryProducts />} />
                 <Route path="/products/:id" element={<ProductDetails />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
@@ -78,6 +87,7 @@ export default function App() {
             </main>
             <Footer />
             <AIAssistant />
+            <CookieBanner />
           </div>
         </Router>
       </CartProvider>

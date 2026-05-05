@@ -1,20 +1,17 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Nexus PC - Technology Stack
 
-# Run and deploy your AI Studio app
+This project is built using the following programming and markup languages:
 
-This contains everything you need to run your app locally.
+## Core Languages
+- **JavaScript (JS)**: Used for the backend server (Node.js/Express) and frontend logic (React).
+- **JSX**: Used for building UI components in React.
+- **SQL**: Used for database schema definitions and querying (MySQL).
+- **HTML**: Used for the application's structure.
+- **CSS**: Used for styling the application (Tailwind CSS and custom stylesheets).
 
-View your app in AI Studio: https://ai.studio/apps/7a63e9b2-d81f-48c0-a50f-8a5f023a1fcf
-
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Key Technologies
+- **Node.js**: Runtime environment for the backend.
+- **React**: Library for high-performance UI components.
+- **MySQL**: Relational database management system.
+- **Google Gemini API**: AI-powered features for PC build advice.
+- **Vite**: Frontend build tool.

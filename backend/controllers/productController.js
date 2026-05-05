@@ -5,7 +5,8 @@ export const getProducts = async (req, res) => {
     const products = await ProductModel.getAllProducts();
     res.json(products);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('❌ Error in getProducts:', error);
+    res.status(500).json({ error: error.message, stack: error.stack });
   }
 };
 
@@ -20,11 +21,10 @@ export const getProductById = async (req, res) => {
 };
 
 export const addProduct = async (req, res) => {
-  const { name, price, stock, category, image, specs } = req.body;
+  const { name, brand, price, stock, category, image, description } = req.body;
   try {
-    const specsString = typeof specs === 'object' ? JSON.stringify(specs) : specs;
-    const id = await ProductModel.createProduct(name, price, stock, category, image, specsString);
-    res.status(201).json({ id, name, price, stock, category, image, specs: specsString });
+    const id = await ProductModel.createProduct(name, brand, price, stock, category, image, description);
+    res.status(201).json({ id, name, brand, price, stock, category, image, description });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

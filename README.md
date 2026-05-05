@@ -1,17 +1,11 @@
-# Nexus PC - Technology Stack
+# Nexus PC - Programming Languages
 
-This project is built using the following programming and markup languages:
+This project is developed using the following languages and technologies:
 
-## Core Languages
-- **JavaScript (JS)**: Used for the backend server (Node.js/Express) and frontend logic (React).
-- **JSX**: Used for building UI components in React.
-- **SQL**: Used for database schema definitions and querying (MySQL).
-- **HTML**: Used for the application's structure.
-- **CSS**: Used for styling the application (Tailwind CSS and custom stylesheets).
-
-## Key Technologies
-- **Node.js**: Runtime environment for the backend.
-- **React**: Library for high-performance UI components.
-- **MySQL**: Relational database management system.
-- **Google Gemini API**: AI-powered features for PC build advice.
-- **Vite**: Frontend build tool.
+- **JavaScript**: Primary language for both backend (Node.js) and frontend (React).
+- **JSX**: Extension used for React UI components.
+- **SQL**: Used for database management and querying.
+- **CSS**: Styling via Tailwind CSS.
+- **HTML**: Structure of the web application.
+- **JSON**: Data interchange and configuration files.
+- **Markdown**: Project documentation (README, LOCAL_SETUP).

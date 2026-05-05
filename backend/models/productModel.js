@@ -1,71 +1,119 @@
 import db from '../config/db.js';
 
 export const getAllProducts = async () => {
-  const [rows] = await db.query('SELECT * FROM products');
-  return rows;
+  try {
+    const [rows] = await db.query(`
+      SELECT p.productID as id, p.name, p.price, p.stock, p.description, p.image_url as image,
+             b.brand_name as brand, c.category_name as category
+      FROM Products p
+      LEFT JOIN Brands b ON p.brandID = b.brandID
+      LEFT JOIN Category c ON p.categoryID = c.categoryID
+    `);
+    
+    if (!rows) return [];
+
+    // Fetch all specs in one go to be efficient
+    const [specRows] = await db.query('SELECT productID, "key", value FROM ProductSpecs');
+    const specsMap = {};
+    specRows.forEach(s => {
+      if (!specsMap[s.productID]) specsMap[s.productID] = {};
+      specsMap[s.productID][s.key] = s.value;
+    });
+
+    const products = rows.map(p => ({
+      ...p,
+      specs: JSON.stringify(specsMap[p.id] || {})
+    }));
+
+    console.log(`✅ Fetched ${products.length} products with specs`);
+    return products;
+  } catch (err) {
+    console.error('❌ Error in getAllProducts:', err.message);
+    console.error('Stack:', err.stack);
+    throw err;
+  }
 };
 
 export const getProductById = async (id) => {
-  const [rows] = await db.query('SELECT * FROM products WHERE id = ?', [id]);
+  const [rows] = await db.query(`
+    SELECT p.productID as id, p.name, p.price, p.stock, p.description, p.image_url as image,
+           b.brand_name as brand, c.category_name as category
+    FROM Products p
+    LEFT JOIN Brands b ON p.brandID = b.brandID
+    LEFT JOIN Category c ON p.categoryID = c.categoryID
+    WHERE p.productID = ?
+  `, [id]);
+  
+  if (rows[0]) {
+    const [specRows] = await db.query('SELECT key, value FROM ProductSpecs WHERE productID = ?', [id]);
+    const specs = {};
+    specRows.forEach(s => { specs[s.key] = s.value; });
+    rows[0].specs = JSON.stringify(specs);
+  }
+  
   return rows[0];
 };
 
-export const createProduct = async (name, brand, price, stock, category, image, specs) => {
+export const createProduct = async (name, brand, price, stock, category, image, description) => {
+  // Ensure Brand exists
+  let [brandRows] = await db.query('SELECT brandID FROM Brands WHERE brand_name = ?', [brand]);
+  let brandID;
+  if (brandRows.length === 0) {
+    const [res] = await db.query('INSERT INTO Brands (brand_name) VALUES (?)', [brand]);
+    brandID = res.insertId;
+  } else {
+    brandID = brandRows[0].brandID;
+  }
+
+  // Ensure Category exists
+  let [catRows] = await db.query('SELECT categoryID FROM Category WHERE category_name = ?', [category]);
+  let categoryID;
+  if (catRows.length === 0) {
+    const [res] = await db.query('INSERT INTO Category (category_name) VALUES (?)', [category]);
+    categoryID = res.insertId;
+  } else {
+    categoryID = catRows[0].categoryID;
+  }
+
   const [result] = await db.query(
-    'INSERT INTO products (name, brand, price, stock, category, image, specs) VALUES (?, ?, ?, ?, ?, ?, ?)',
-    [name, brand, price, stock, category, image, specs]
+    'INSERT INTO Products (name, price, stock, description, image_url, brandID, categoryID) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    [name, price, stock, description, image, brandID, categoryID]
   );
   return result.insertId;
 };
 
 export const initDb = async () => {
-  await db.query(`
-    CREATE TABLE IF NOT EXISTS products (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      brand TEXT NOT NULL,
-      price REAL NOT NULL,
-      stock INTEGER NOT NULL,
-      category TEXT,
-      image TEXT,
-      specs TEXT
-    )
-  `);
-
   // Seed data if table is empty
-  const [rows] = await db.query('SELECT COUNT(*) as count FROM products');
+  const [rows] = await db.query('SELECT COUNT(*) as count FROM Products');
   if (rows[0].count === 0) {
     const seedProducts = [
       // CPU
-      { name: 'Core i9-14900K', brand: 'Intel', price: 589.00, stock: 10, category: 'CPU', image: 'https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&q=80&w=300&h=300', specs: JSON.stringify({ socket: 'LGA1700', cores: 24 }) },
-      { name: 'Ryzen 9 7950X3D', brand: 'AMD', price: 699.00, stock: 5, category: 'CPU', image: 'https://images.unsplash.com/photo-1555617766-c94804975da3?auto=format&fit=crop&q=80&w=300&h=300', specs: JSON.stringify({ socket: 'AM5', cores: 16 }) },
+      { name: 'Core i9-14900K', brand: 'Intel', price: 589.00, stock: 10, category: 'CPU', image: 'https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&q=80&w=600&h=600', specs: { socket: 'LGA1700', cores: 24 } },
+      { name: 'Ryzen 9 7950X3D', brand: 'AMD', price: 699.00, stock: 5, category: 'CPU', image: 'https://images.unsplash.com/photo-1555617766-c94804975da3?auto=format&fit=crop&q=80&w=600&h=600', specs: { socket: 'AM5', cores: 16 } },
       // GPU
-      { name: 'RTX 4090 Founders Edition', brand: 'NVIDIA', price: 1599.99, stock: 2, category: 'GPU', image: 'https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&q=80&w=300&h=300', specs: JSON.stringify({ vram: '24GB' }) },
-      { name: 'ROG Strix RTX 4080 Super', brand: 'ASUS', price: 1249.99, stock: 5, category: 'GPU', image: 'https://images.unsplash.com/photo-1591405351990-4726e331f141?auto=format&fit=crop&q=80&w=300&h=300', specs: JSON.stringify({ vram: '16GB' }) },
+      { name: 'RTX 4090 Founders Edition', brand: 'NVIDIA', price: 1599.99, stock: 2, category: 'GPU', image: 'https://images.unsplash.com/photo-1591405351990-4726e331f141?auto=format&fit=crop&q=80&w=600&h=600', specs: { vram: '24GB' } },
+      { name: 'ROG Strix RTX 4080 Super', brand: 'ASUS', price: 1249.99, stock: 5, category: 'GPU', image: 'https://images.unsplash.com/photo-1588600101460-b635f7959082?auto=format&fit=crop&q=80&w=600&h=600', specs: { vram: '16GB' } },
       // Ram
-      { name: 'Vengeance RGB 32GB DDR5', brand: 'Corsair', price: 159.99, stock: 25, category: 'Ram', image: 'https://images.unsplash.com/photo-1562976540-1502c2145186?auto=format&fit=crop&q=80&w=300&h=300', specs: JSON.stringify({ speed: '6000MT/s' }) },
-      { name: 'Trident Z5 Neo 32GB', brand: 'G.Skill', price: 124.99, stock: 20, category: 'Ram', image: 'https://images.unsplash.com/photo-1562976540-1502c2145186?auto=format&fit=crop&q=80&w=300&h=300', specs: JSON.stringify({ speed: '6000MT/s' }) },
+      { name: 'Vengeance RGB 32GB DDR5', brand: 'Corsair', price: 159.99, stock: 25, category: 'Ram', image: 'https://images.unsplash.com/photo-1562976540-1502c2145186?auto=format&fit=crop&q=80&w=600&h=600', specs: { speed: '6000MT/s' } },
+      { name: 'Trident Z5 Neo 32GB', brand: 'G.Skill', price: 124.99, stock: 20, category: 'Ram', image: 'https://images.unsplash.com/photo-1599666060175-e7d452d27658?auto=format&fit=crop&q=80&w=600&h=600', specs: { speed: '6000MT/s' } },
       // Rom
-      { name: '990 PRO 2TB', brand: 'Samsung', price: 189.99, stock: 30, category: 'Rom', image: 'https://images.unsplash.com/photo-1597852074816-d933c4d2b988?auto=format&fit=crop&q=80&w=300&h=300', specs: JSON.stringify({ type: 'NVMe' }) },
-      { name: 'WD_BLACK SN850X 2TB', brand: 'Western Digital', price: 164.99, stock: 15, category: 'Rom', image: 'https://images.unsplash.com/photo-1597852074816-d933c4d2b988?auto=format&fit=crop&q=80&w=300&h=300', specs: JSON.stringify({ type: 'NVMe' }) },
+      { name: '990 PRO 2TB', brand: 'Samsung', price: 189.99, stock: 30, category: 'Rom', image: 'https://images.unsplash.com/photo-1597852074816-d933c4d2b988?auto=format&fit=crop&q=80&w=600&h=600', specs: { type: 'NVMe' } },
+      { name: 'WD_BLACK SN850X 2TB', brand: 'Western Digital', price: 164.99, stock: 15, category: 'Rom', image: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&q=80&w=600&h=600', specs: { type: 'NVMe' } },
       // PSU
-      { name: 'RM850x 850W', brand: 'Corsair', price: 129.99, stock: 12, category: 'PSU', image: 'https://images.unsplash.com/photo-1631284562080-60f9ee06f32e?auto=format&fit=crop&q=80&w=300&h=300', specs: JSON.stringify({ wattage: '850W' }) },
+      { name: 'RM850x 850W', brand: 'Corsair', price: 129.99, stock: 12, category: 'PSU', image: 'https://images.unsplash.com/photo-1631284562080-60f9ee06f32e?auto=format&fit=crop&q=80&w=600&h=600', specs: { wattage: '850W' } },
       // Cases
-      { name: 'O11 Dynamic EVO', brand: 'Lian Li', price: 169.99, stock: 10, category: 'cases', image: 'https://images.unsplash.com/photo-1624705002806-5d72df19c3ad?auto=format&fit=crop&q=80&w=300&h=300', specs: JSON.stringify({ type: 'Mid Tower' }) },
+      { name: 'O11 Dynamic EVO', brand: 'Lian Li', price: 169.99, stock: 10, category: 'cases', image: 'https://images.unsplash.com/photo-1624705002806-5d72df19c3ad?auto=format&fit=crop&q=80&w=600&h=600', specs: { type: 'Mid Tower' } },
       // Peripherals
-      { name: 'G Pro X Superlight 2', brand: 'Logitech', price: 159.00, stock: 20, category: 'mouses', image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&q=80&w=300&h=300', specs: JSON.stringify({ weight: '60g' }) },
-      { name: 'Apex Pro TKL', brand: 'SteelSeries', price: 189.99, stock: 15, category: 'keyboards', image: 'https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?auto=format&fit=crop&q=80&w=300&h=300', specs: JSON.stringify({ switches: 'OmniPoint' }) },
-      { name: 'TITAN Evo 2022', brand: 'Secretlab', price: 549.00, stock: 5, category: 'gaming-chairs', image: 'https://images.unsplash.com/photo-1592078615290-033ee584e267?auto=format&fit=crop&q=80&w=300&h=300', specs: JSON.stringify({ material: 'Leatherette' }) }
+      { name: 'G Pro X Superlight 2', brand: 'Logitech', price: 159.00, stock: 20, category: 'mouses', image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&q=80&w=600&h=600', specs: { weight: '60g' } },
+      { name: 'Apex Pro TKL', brand: 'SteelSeries', price: 189.99, stock: 15, category: 'keyboards', image: 'https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?auto=format&fit=crop&q=80&w=600&h=600', specs: { switches: 'OmniPoint' } },
+      { name: 'TITAN Evo 2022', brand: 'Secretlab', price: 549.00, stock: 5, category: 'gaming-chairs', image: 'https://images.unsplash.com/photo-1592078615290-033ee584e267?auto=format&fit=crop&q=80&w=600&h=600', specs: { material: 'Leatherette' } }
     ];
 
     for (const p of seedProducts) {
-      // Check if product exists by name to update image if needed, otherwise insert
-      const [existing] = await db.query('SELECT id FROM products WHERE name = ?', [p.name]);
-      if (existing.length > 0) {
-        await db.query('UPDATE products SET image = ? WHERE id = ?', [p.image, existing[0].id]);
-      } else {
-        await db.query('INSERT INTO products (name, brand, price, stock, category, image, specs) VALUES (?, ?, ?, ?, ?, ?, ?)', 
-        [p.name, p.brand, p.price, p.stock, p.category, p.image, p.specs]);
+      const productId = await createProduct(p.name, p.brand, p.price, p.stock, p.category, p.image, `${p.brand} ${p.name} - High quality PC component.`);
+      // Add specs
+      for (const [key, value] of Object.entries(p.specs)) {
+        await db.query('INSERT INTO ProductSpecs (productID, key, value) VALUES (?, ?, ?)', [productId, key, String(value)]);
       }
     }
   }

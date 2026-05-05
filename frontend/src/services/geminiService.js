@@ -36,7 +36,7 @@ export const getBuildAdvice = async (messages, products) => {
     const userPrompt = lastMessage.content || lastMessage.parts?.[0]?.text || "";
 
     const chat = ai.chats.create({
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.0-flash",
       config: {
         systemInstruction: systemInstruction,
       },

@@ -13,8 +13,7 @@ export const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     
     // Check if any users exist
-    const [rows] = await UserModel.db.query('SELECT COUNT(*) as count FROM users');
-    const userCount = rows[0].count;
+    const userCount = await UserModel.getUserCount();
     const role = userCount === 0 ? 'admin' : 'user';
     
     const userId = await UserModel.createUser(name, email, hashedPassword, role);
@@ -37,8 +36,8 @@ export const login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
 
-    const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
-    res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
+    const token = jwt.sign({ id: user.userID, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
+    res.json({ token, user: { id: user.userID, name: user.name, email: user.email, role: user.role } });
   } catch (error) {
     console.error('❌ Login error:', error);
     res.status(500).json({ message: error.message || 'Login failed' });
@@ -49,7 +48,7 @@ export const getMe = async (req, res) => {
   try {
     const user = await UserModel.getUserById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
-    res.json({ id: user.id, name: user.name, email: user.email, role: user.role });
+    res.json({ id: user.userID, name: user.name, email: user.email, role: user.role });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

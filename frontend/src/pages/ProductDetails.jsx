@@ -6,6 +6,7 @@ import { ShoppingCart, ArrowLeft, Shield, Truck, Zap, Package } from 'lucide-rea
 import { useCart } from '../context/CartContext';
 import { formatPrice } from '../utils/formatPrice';
 import Loader from '../components/Loader';
+import ReviewSection from '../components/ReviewSection';
 import '../styles/ProductDetails.css';
 
 export default function ProductDetails() {
@@ -110,6 +111,8 @@ export default function ProductDetails() {
           </div>
         </motion.div>
       </div>
+
+      <ReviewSection productID={product.id} />
     </div>
   );
 }

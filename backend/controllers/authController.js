@@ -20,9 +20,11 @@ export const register = async (req, res) => {
     const userId = await UserModel.createUser(name, email, hashedPassword, role);
     
     const token = jwt.sign({ id: userId, role }, JWT_SECRET, { expiresIn: '24h' });
+    console.log(`✅ User registered successfully: ${email}`);
     res.status(201).json({ token, user: { id: userId, name, email, role } });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('❌ Registration error:', error);
+    res.status(500).json({ message: error.message || 'Registration failed' });
   }
 };
 
@@ -38,7 +40,8 @@ export const login = async (req, res) => {
     const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
     res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('❌ Login error:', error);
+    res.status(500).json({ message: error.message || 'Login failed' });
   }
 };
 
@@ -48,6 +51,6 @@ export const getMe = async (req, res) => {
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json({ id: user.id, name: user.name, email: user.email, role: user.role });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };

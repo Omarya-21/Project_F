@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import productRoutes from './routes/productRoutes.js';
 import authRoutes from './routes/authRoutes.js';
-import aiRoutes from './routes/aiRoutes.js';
 import { initDb } from './models/productModel.js';
 import { initUserTable } from './models/userModel.js';
 
@@ -17,6 +16,5 @@ initUserTable().then(() => console.log('Users table initialized')).catch(console
 // API Routes
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
-app.use('/api/ai', aiRoutes);
 
 export default app;

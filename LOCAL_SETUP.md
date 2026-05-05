@@ -1,54 +1,59 @@
-# Omar's PC - Local Setup Instructions (XAMPP & MySQL)
+# Nexus PC - Local Setup Instructions
 
-Follow these steps to run the application on your computer using XAMPP and MySQL.
+Follow these steps to run the Nexus PC application on your computer. This app uses a Node.js backend with SQLite and a React frontend.
 
 ## Prerequisites
-- [Node.js](https://nodejs.org/) (Version 16 or higher)
-- [XAMPP](https://www.apachefriends.org/index.html) (For MySQL)
+- [Node.js](https://nodejs.org/) (Version 18 or higher recommended)
+- npm (comes with Node.js)
 
-## 1. Database Setup (MySQL)
-1. Start **XAMPP Control Panel**.
-2. Start the **MySQL** module.
-3. Open your browser and go to `http://localhost/phpmyadmin`.
-4. Click on **New** to create a new database.
-5. Name the database `omar_pc` and click **Create**.
+## 1. Project Configuration
 
-## 2. Server Configuration
 1. Open the project folder in your code editor.
-2. Navigate to the `backend` folder.
-3. Copy the `.env.example` file and rename it to `.env`.
-4. Open the `.env` file and verify the settings:
+2. **Environment Variables**:
+   - Both the root directory and the `backend` directory have `.env.example` files.
+   - You should create a `.env` file in the `backend` folder based on `.env.example`.
+   - **Important**: Add your `GEMINI_API_KEY` to the `backend/.env` file to enable AI features.
+
    ```env
-   DB_HOST=localhost
-   DB_USER=root
-   DB_PASSWORD=
-   DB_NAME=omar_pc
    PORT=3000
    JWT_SECRET=your_random_secret_string
    GEMINI_API_KEY=your_google_ai_key
    ```
-   *Note: If you have a different MySQL user/password in XAMPP, update them here.*
 
-## 3. Installation & Running
-Since these are separated projects, you will manage them in two different terminal windows.
+## 2. Installation & Running
 
-### A. Backend (The Server)
+You can install all dependencies and run both the frontend and backend using the root commands.
+
+### One-Command Setup (Recommended)
+1. Open a terminal in the **root** folder of the project.
+2. Run: `npm install`
+   - *This will automatically install dependencies for both the frontend and backend.*
+3. Run: `npm run dev`
+   - *This starts both the backend (port 3000) and the frontend concurrently.*
+
+### Manual Step-by-Step (Optional)
+If you prefer to run them separately:
+
+#### A. Backend (The Server)
 1. Open a terminal in the `backend` folder.
 2. Run: `npm install`
-3. Run: `npm start` (or `node app.js`)
-   - *Note: The server will automatically create your database tables on the first run.*
+3. Run: `npm start`
+   - *The server will automatically create the SQLite database file (`nexus.db`) and tables on the first run.*
 
-### B. Frontend (The User Interface)
+#### B. Frontend (The User Interface)
 1. Open a **new** terminal in the `frontend` folder.
 2. Run: `npm install`
 3. Run: `npm run dev`
-4. Open the link shown (usually `http://localhost:5173`).
+4. Access the app at the URL provided in the terminal (usually `http://localhost:5173`).
 
-## 5. Admin Access
+## 3. Database
+This application uses **SQLite**, so no external database server (like MySQL or XAMPP) is required. The database file will be created at `backend/database/nexus.db`.
+
+## 4. Admin Access
 The **first user** who registers on the site will automatically be granted **Admin** rights. 
-1. Go to the "Logon" page.
-2. Create your account.
-3. You will see an "Admin" link in the navbar to manage products.
+1. Navigate to the "Login/Register" page.
+2. Create a new account.
+3. Once logged in, you will see an "Admin" link in the navigation menu to manage products and inventory.
 
 ---
-*Developed by Omar's PC Systems*
+*Nexus PC - Smart PC Building Solutions*

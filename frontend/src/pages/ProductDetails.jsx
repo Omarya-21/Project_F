@@ -32,9 +32,9 @@ export default function ProductDetails() {
   if (!product) return <div className="pt-32 text-center text-red-500 font-bold">ERROR: HARDWARE SEGMENT NOT FOUND</div>;
 
   return (
-    <div className="pt-24 pb-20">
-      <Link to="/products" className="inline-flex items-center gap-2 text-gray-500 hover:text-white transition-colors mb-8 text-xs font-bold uppercase tracking-widest">
-        <ArrowLeft size={16} /> Return to Inventory
+    <div className="pt-24 pb-20 px-4 max-w-7xl mx-auto">
+      <Link to={`/category/${product.category}`} className="inline-flex items-center gap-2 text-gray-500 hover:text-white transition-colors mb-8 text-xs font-bold uppercase tracking-widest">
+        <ArrowLeft size={16} /> Return to {product.category}
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">

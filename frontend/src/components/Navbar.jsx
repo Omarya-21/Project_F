@@ -13,9 +13,11 @@ export default function Navbar() {
         </Link>
         
         <div className="flex items-center gap-8 text-xs font-bold uppercase tracking-widest">
-          <div className="hidden group xl:block relative h-16 flex items-center">
-            <span className="text-gray-400 cursor-default">Components</span>
-            <div className="absolute top-full left-0 w-48 bg-black border border-gray-800 rounded-b-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all py-4 flex flex-col gap-2">
+          <div className="relative group h-16 flex items-center">
+            <span className="text-gray-400 cursor-default flex items-center gap-1 group-hover:text-white transition-colors">
+              Hardware <span className="text-[10px] opacity-50">▼</span>
+            </span>
+            <div className="absolute top-full left-0 w-48 bg-black border border-gray-800 rounded-b-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all py-4 flex flex-col gap-2 shadow-2xl">
               <Link to="/category/CPU" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Processors</Link>
               <Link to="/category/GPU" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Graphics Cards</Link>
               <Link to="/category/Motherboard" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Motherboards</Link>
@@ -23,7 +25,7 @@ export default function Navbar() {
               <Link to="/category/PSU" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Power Supplies</Link>
             </div>
           </div>
-          <Link to="/products" className="text-gray-400 hover:text-white transition-colors">All Parts</Link>
+          
           <Link to="/cart" className="relative text-gray-400 hover:text-white transition-colors">
             <ShoppingCart size={18} />
           </Link>

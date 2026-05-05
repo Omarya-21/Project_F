@@ -2,26 +2,45 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getProducts } from '../services/productService';
 import ProductCard from '../components/ProductCard';
-import { Cpu, Layout, Disc, Activity, Zap } from 'lucide-react';
+import { Cpu, Layout, Disc, Activity, Zap, HardDrive, Monitor, Mouse, Keyboard, Headphones, Gamepad, Armchair, Table } from 'lucide-react';
 
 const categoryIcons = {
   CPU: <Cpu size={40} />,
   GPU: <Activity size={40} />,
   Motherboard: <Layout size={40} />,
-  RAM: <Disc size={40} />,
-  PSU: <Zap size={40} />
+  Ram: <Disc size={40} />,
+  Rom: <HardDrive size={40} />,
+  PSU: <Zap size={40} />,
+  cases: <Activity size={40} />,
+  screens: <Monitor size={40} />,
+  mouses: <Mouse size={40} />,
+  keyboards: <Keyboard size={40} />,
+  headphones: <Headphones size={40} />,
+  controllers: <Gamepad size={40} />,
+  'gaming-chairs': <Armchair size={40} />,
+  'pc-tables': <Table size={40} />
 };
 
 const categoryNames = {
   CPU: 'Processors',
   GPU: 'Graphics Cards',
   Motherboard: 'Motherboards',
-  RAM: 'Memory',
-  PSU: 'Power Supplies'
+  Ram: 'Memory (RAM)',
+  Rom: 'Storage (ROM/SSD)',
+  PSU: 'Power Supplies',
+  cases: 'Chassis & Cases',
+  screens: 'Gaming Monitors',
+  mouses: 'Gaming Mice',
+  keyboards: 'Mechanical Keyboards',
+  headphones: 'Audio & Headsets',
+  controllers: 'Game Controllers',
+  'gaming-chairs': 'Pro Gaming Chairs',
+  'pc-tables': 'Gaming Desks'
 };
 
-export default function CategoryProducts() {
-  const { categoryName } = useParams();
+export default function CategoryProducts({ categoryOverride }) {
+  const { categoryName: paramCategory } = useParams();
+  const categoryName = categoryOverride || paramCategory;
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -40,6 +59,13 @@ export default function CategoryProducts() {
     };
     fetchProducts();
   }, [categoryName]);
+
+  const groupedProducts = products.reduce((acc, product) => {
+    const brand = product.brand || 'Other';
+    if (!acc[brand]) acc[brand] = [];
+    acc[brand].push(product);
+    return acc;
+  }, {});
 
   return (
     <div className="pt-24 pb-20 px-4 max-w-7xl mx-auto">
@@ -63,10 +89,25 @@ export default function CategoryProducts() {
             <div key={i} className="aspect-square bg-gray-900 animate-pulse rounded-2xl" />
           ))}
         </div>
-      ) : products.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {products.map(product => (
-            <ProductCard key={product.id} product={product} />
+      ) : Object.keys(groupedProducts).length > 0 ? (
+        <div className="space-y-16">
+          {Object.entries(groupedProducts).sort().map(([brand, brandProducts]) => (
+            <div key={brand}>
+              <div className="flex items-center gap-4 mb-8">
+                <h2 className="text-2xl font-black italic uppercase tracking-widest text-blue-500">
+                  {brand}
+                </h2>
+                <div className="h-px bg-gray-800 grow"></div>
+                <span className="text-[10px] font-black bg-gray-800 text-gray-400 px-3 py-1 rounded-full uppercase tracking-widest">
+                  {brandProducts.length} Units
+                </span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {brandProducts.map(product => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       ) : (

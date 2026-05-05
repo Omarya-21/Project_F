@@ -7,6 +7,7 @@ USE omar_pc;
 CREATE TABLE IF NOT EXISTS products (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
+    brand VARCHAR(100) NOT NULL,
     price DECIMAL(10,2) NOT NULL,
     stock INT NOT NULL,
     category VARCHAR(100),

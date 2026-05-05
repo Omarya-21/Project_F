@@ -22,9 +22,9 @@ export default function Footer() {
         <div>
           <h4 className="text-white font-bold mb-6 uppercase tracking-widest text-xs">Support</h4>
           <ul className="space-y-4 text-gray-500 text-sm">
+            <li><Link to="/about" className="hover:text-blue-500 transition-colors">About Us</Link></li>
             <li><Link to="/contact" className="hover:text-blue-500 transition-colors">Contact Us</Link></li>
             <li><a href="#" className="hover:text-blue-500 transition-colors">Build Guides</a></li>
-            <li><a href="#" className="hover:text-blue-500 transition-colors">Support Center</a></li>
           </ul>
         </div>
         

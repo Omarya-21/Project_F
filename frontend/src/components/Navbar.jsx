@@ -15,16 +15,31 @@ export default function Navbar() {
         <div className="flex items-center gap-8 text-xs font-bold uppercase tracking-widest">
           <div className="relative group h-16 flex items-center">
             <span className="text-gray-400 cursor-default flex items-center gap-1 group-hover:text-white transition-colors">
-              Hardware <span className="text-[10px] opacity-50">▼</span>
+              Store <span className="text-[10px] opacity-50">▼</span>
             </span>
-            <div className="absolute top-full left-0 w-48 bg-black border border-gray-800 rounded-b-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all py-4 flex flex-col gap-2 shadow-2xl">
-              <Link to="/category/CPU" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Processors</Link>
-              <Link to="/category/GPU" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Graphics Cards</Link>
-              <Link to="/category/Motherboard" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Motherboards</Link>
-              <Link to="/category/RAM" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Memory</Link>
-              <Link to="/category/PSU" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Power Supplies</Link>
+            <div className="absolute top-full left-0 w-64 bg-black border border-gray-800 rounded-b-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all py-6 grid grid-cols-1 gap-1 shadow-2xl z-50 overflow-y-auto max-h-[80vh]">
+              <div className="px-6 pb-2 text-[10px] text-gray-500 font-black uppercase tracking-[0.2em]">Components</div>
+              <Link to="/store/cpu" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Processors (CPU)</Link>
+              <Link to="/store/gpu" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Graphics Cards (GPU)</Link>
+              <Link to="/store/ram" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Memory (RAM)</Link>
+              <Link to="/store/rom" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Storage (SSD/HDD)</Link>
+              <Link to="/store/psu" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Power Supplies</Link>
+              <Link to="/store/cases" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Chassis/Cases</Link>
+              
+              <div className="px-6 pt-4 pb-2 text-[10px] text-gray-500 font-black uppercase tracking-[0.2em]">Peripherals</div>
+              <Link to="/store/screens" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Monitors</Link>
+              <Link to="/store/mouses" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Mice</Link>
+              <Link to="/store/keyboards" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Keyboards</Link>
+              <Link to="/store/headphones" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Audio/Headsets</Link>
+              <Link to="/store/controllers" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Controllers</Link>
+
+              <div className="px-6 pt-4 pb-2 text-[10px] text-gray-500 font-black uppercase tracking-[0.2em]">Setup</div>
+              <Link to="/store/gaming-chairs" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Gaming Chairs</Link>
+              <Link to="/store/pc-tables" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Gaming Desks</Link>
             </div>
           </div>
+          
+          <Link to="/about" className="text-gray-400 hover:text-white transition-colors">About</Link>
           
           <Link to="/cart" className="relative text-gray-400 hover:text-white transition-colors">
             <ShoppingCart size={18} />

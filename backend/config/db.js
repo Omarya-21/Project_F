@@ -1,11 +1,16 @@
-import Database from 'better-sqlite3';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import mysql from 'mysql2/promise';
+import dotenv from 'dotenv';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+dotenv.config();
 
-const dbPath = path.resolve(__dirname, '../../database/nexus.db');
-const db = new Database(dbPath);
+const pool = mysql.createPool({
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'omar_pc',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+});
 
-export default db;
+export default pool;

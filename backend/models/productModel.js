@@ -1,36 +1,39 @@
 import db from '../config/db.js';
 
-export const getAllProducts = () => {
-  return db.prepare('SELECT * FROM products').all();
+export const getAllProducts = async () => {
+  const [rows] = await db.query('SELECT * FROM products');
+  return rows;
 };
 
-export const getProductById = (id) => {
-  return db.prepare('SELECT * FROM products WHERE id = ?').get(id);
+export const getProductById = async (id) => {
+  const [rows] = await db.query('SELECT * FROM products WHERE id = ?', [id]);
+  return rows[0];
 };
 
-export const createProduct = (name, price, stock, category, image, specs) => {
-  const info = db.prepare(
-    'INSERT INTO products (name, price, stock, category, image, specs) VALUES (?, ?, ?, ?, ?, ?)'
-  ).run(name, price, stock, category, image, specs);
-  return info.lastInsertRowid;
+export const createProduct = async (name, price, stock, category, image, specs) => {
+  const [result] = await db.query(
+    'INSERT INTO products (name, price, stock, category, image, specs) VALUES (?, ?, ?, ?, ?, ?)',
+    [name, price, stock, category, image, specs]
+  );
+  return result.insertId;
 };
 
-export const initDb = () => {
-  db.exec(`
+export const initDb = async () => {
+  await db.query(`
     CREATE TABLE IF NOT EXISTS products (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      price REAL NOT NULL,
-      stock INTEGER NOT NULL,
-      category TEXT,
+      id INT PRIMARY KEY AUTO_INCREMENT,
+      name VARCHAR(255) NOT NULL,
+      price DECIMAL(10,2) NOT NULL,
+      stock INT NOT NULL,
+      category VARCHAR(100),
       image TEXT,
-      specs TEXT -- JSON string containing technical specifications
+      specs TEXT
     )
   `);
 
   // Seed data if table is empty
-  const count = db.prepare('SELECT COUNT(*) as count FROM products').get().count;
-  if (count === 0) {
+  const [rows] = await db.query('SELECT COUNT(*) as count FROM products');
+  if (rows[0].count === 0) {
     const seedProducts = [
       {
         name: 'Intel Core i9-13900K',
@@ -90,7 +93,9 @@ export const initDb = () => {
       }
     ];
 
-    const insert = db.prepare('INSERT INTO products (name, price, stock, category, image, specs) VALUES (?, ?, ?, ?, ?, ?)');
-    seedProducts.forEach(p => insert.run(p.name, p.price, p.stock, p.category, p.image, p.specs));
+    for (const p of seedProducts) {
+      await db.query('INSERT INTO products (name, price, stock, category, image, specs) VALUES (?, ?, ?, ?, ?, ?)', 
+      [p.name, p.price, p.stock, p.category, p.image, p.specs]);
+    }
   }
 };

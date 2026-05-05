@@ -1,34 +1,13 @@
 import { GoogleGenAI } from "@google/genai";
 
-const getApiKey = () => {
-  // Try different ways the platform might provide the key
-  return (typeof process !== 'undefined' && process.env ? process.env.GEMINI_API_KEY : null) || 
-         (import.meta.env ? import.meta.env.VITE_GEMINI_API_KEY : null) ||
-         "";
-};
-
-let genAIInstance = null;
-
-const getAIInstance = () => {
-  if (!genAIInstance) {
-    const key = getApiKey();
-    if (!key) {
-      throw new Error("AI Configuration Error: Missing API Key");
-    }
-    genAIInstance = new GoogleGenAI(key);
-  }
-  return genAIInstance;
-};
+// Initialization follows the skill's guidance for React (Vite)
+// The API key is handled externally by the platform.
+const ai = new GoogleGenAI({ 
+  apiKey: process.env.GEMINI_API_KEY || "" 
+});
 
 export const getBuildAdvice = async (messages, products) => {
-  const apiKey = getApiKey();
-  if (!apiKey) {
-    console.error("GEMINI_API_KEY is missing!");
-    throw new Error("AI Configuration Error: Missing API Key");
-  }
-
   try {
-    const aiAccount = getAIInstance();
     const systemInstruction = `
       You are a Nexus PC Build Assistant. Your goal is to help customers choose compatible PC parts from our inventory.
       
@@ -48,7 +27,6 @@ export const getBuildAdvice = async (messages, products) => {
     `;
 
     // Process messages for chat
-    // The last message is the current user prompt
     const history = messages.slice(0, -1).map(m => ({
       role: m.role === 'model' ? 'model' : 'user',
       parts: [{ text: m.content || m.parts?.[0]?.text || "" }]
@@ -57,20 +35,23 @@ export const getBuildAdvice = async (messages, products) => {
     const lastMessage = messages[messages.length - 1];
     const userPrompt = lastMessage.content || lastMessage.parts?.[0]?.text || "";
 
-    const model = aiAccount.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
-      systemInstruction: systemInstruction,
-    });
-
-    const chat = model.startChat({
+    const chat = ai.chats.create({
+      model: "gemini-3-flash-preview",
+      config: {
+        systemInstruction: systemInstruction,
+      },
       history: history
     });
 
-    const result = await chat.sendMessage(userPrompt);
-    const text = result.response.text();
+    const response = await chat.sendMessage({
+      message: userPrompt
+    });
 
-    return text;
+    return response.text;
   } catch (error) {
+    if (error.message?.includes("API Key")) {
+      console.error("Gemini API Key Error. Please ensure GEMINI_API_KEY is set in the environment.");
+    }
     console.error("AI Advice Service Error:", error);
     throw error;
   }

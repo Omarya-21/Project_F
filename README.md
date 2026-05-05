@@ -1,28 +1,20 @@
-# Nexus Hardware - E-Commerce Platform
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+</div>
 
-A high-performance e-commerce platform for computer hardware, built with a modern full-stack architecture.
+# Run and deploy your AI Studio app
 
-## Tech Stack
+This contains everything you need to run your app locally.
 
-### Frontend
-- **Language**: JavaScript / TypeScript
-- **Framework**: React 19
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS (Utility-first styling) & Framer Motion (Animations)
-- **State Management**: React Context API
-- **Charts**: Recharts
-- **Icons**: Lucide React
+View your app in AI Studio: https://ai.studio/apps/7a63e9b2-d81f-48c0-a50f-8a5f023a1fcf
 
-### Backend
-- **Language**: Node.js (JavaScript)
-- **Framework**: Express.js
-- **Database**: SQLite
-- **Authentication**: JWT (JSON Web Tokens)
-- **File Uploads**: Multer
+## Run Locally
 
-## Project Structure
-- `/src`: Unified application source code.
-- `/src/server`: Backend Express server and SQLite database logic.
-- `/index.html`: Web application entry point.
-- `/package.json`: Project manifest and scripts.
-- `/vite.config.js`: Vite build and proxy configuration.
+**Prerequisites:**  Node.js
+
+
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`

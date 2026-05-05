@@ -13,8 +13,17 @@ export default function ProductCard({ product }) {
       className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden group p-5 flex flex-col"
     >
       <Link to={`/products/${product.id}`} className="block relative aspect-square bg-black rounded-xl mb-6 overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Package size={64} className="text-gray-900 group-hover:text-blue-900/40 transition-colors" />
+        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+          {product.image ? (
+            <img 
+              src={product.image} 
+              alt={product.name} 
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+              referrerPolicy="no-referrer"
+            />
+          ) : (
+            <Package size={64} className="text-gray-900 group-hover:text-blue-900/40 transition-colors" />
+          )}
         </div>
         <div className="absolute inset-0 bg-blue-600/0 group-hover:bg-blue-600/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
           <Eye className="text-white" size={32} />

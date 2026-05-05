@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import AIAssistant from './components/AIAssistant';
 import Home from './pages/Home';
 import Products from './pages/Products';
 import ProductDetails from './pages/ProductDetails';
@@ -76,6 +77,7 @@ export default function App() {
               </Routes>
             </main>
             <Footer />
+            <AIAssistant />
           </div>
         </Router>
       </CartProvider>

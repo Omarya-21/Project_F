@@ -10,7 +10,7 @@
     "lint": "cd frontend && npm run lint"
   },
   "dependencies": {
-    "@google/genai": "^1.29.0",
+    "@google/genai": "^1.52.0",
     "@tailwindcss/vite": "^4.2.4",
     "@vitejs/plugin-react": "^5.2.0",
     "axios": "^1.16.0",

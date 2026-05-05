@@ -7,14 +7,14 @@ export default function ProductsAdmin() {
   const [products, setProducts] = useState([]);
   const [newProduct, setNewProduct] = useState({ name: '', price: '', stock: '', category: '' });
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
   const fetchProducts = async () => {
     const data = await getProducts();
     setProducts(data);
   };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

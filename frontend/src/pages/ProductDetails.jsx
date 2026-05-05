@@ -41,9 +41,18 @@ export default function ProductDetails() {
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="aspect-square bg-gray-900 border border-gray-800 rounded-3xl flex items-center justify-center"
+          className="aspect-square bg-gray-900 border border-gray-800 rounded-3xl flex items-center justify-center overflow-hidden"
         >
-          <Package size={120} className="text-gray-800" />
+          {product.image ? (
+            <img 
+              src={product.image} 
+              alt={product.name} 
+              className="w-full h-full object-cover"
+              referrerPolicy="no-referrer"
+            />
+          ) : (
+            <Package size={120} className="text-gray-800" />
+          )}
         </motion.div>
 
         <motion.div
@@ -52,9 +61,23 @@ export default function ProductDetails() {
         >
           <span className="text-blue-500 font-black text-xs tracking-[0.3em] uppercase mb-4 block italic">Authorized Component</span>
           <h1 className="text-4xl md:text-5xl font-black text-white mb-4 uppercase italic leading-tight">{product.name}</h1>
-          <p className="text-gray-400 text-lg mb-8 leading-relaxed">
+          <p className="text-gray-400 text-lg mb-4 leading-relaxed">
             {product.description || 'Advanced hardware architecture designed for high-performance computing environments. Nexus certified and stress-tested for maximum stability and speed.'}
           </p>
+
+          {product.specs && (
+            <div className="mb-8 p-6 bg-gray-900 border border-gray-800 rounded-2xl">
+              <h3 className="text-xs font-black text-blue-500 uppercase tracking-widest mb-4">Technical Specifications</h3>
+              <div className="grid grid-cols-2 gap-4">
+                {Object.entries(JSON.parse(product.specs)).map(([key, value]) => (
+                  <div key={key} className="flex flex-col">
+                    <span className="text-[10px] text-gray-500 uppercase font-bold">{key.replace('_', ' ')}</span>
+                    <span className="text-sm text-white font-medium">{value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="flex items-center gap-6 mb-10">
             <span className="text-4xl font-black text-white">{formatPrice(product.price)}</span>

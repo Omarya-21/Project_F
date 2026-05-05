@@ -20,10 +20,11 @@ export const getProductById = (req, res) => {
 };
 
 export const addProduct = (req, res) => {
-  const { name, price, stock, category } = req.body;
+  const { name, price, stock, category, image, specs } = req.body;
   try {
-    const id = ProductModel.createProduct(name, price, stock, category);
-    res.status(201).json({ id, name, price, stock, category });
+    const specsString = typeof specs === 'object' ? JSON.stringify(specs) : specs;
+    const id = ProductModel.createProduct(name, price, stock, category, image, specsString);
+    res.status(201).json({ id, name, price, stock, category, image, specs: specsString });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

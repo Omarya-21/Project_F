@@ -14,7 +14,8 @@ export const AuthProvider = ({ children }) => {
         try {
           const userData = await authService.getMe();
           setUser(userData);
-        } catch (error) {
+        } catch (err) {
+          console.error("Auth init failure:", err);
           localStorage.removeItem('token');
         }
       }

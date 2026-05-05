@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { Package } from 'lucide-react';
 import '../styles/Orders.css';
 

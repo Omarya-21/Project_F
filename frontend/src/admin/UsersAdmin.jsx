@@ -1,4 +1,4 @@
-import { Shield, ShieldAlert, ShieldCheck } from 'lucide-react';
+import { ShieldAlert } from 'lucide-react';
 import '../styles/UsersAdmin.css';
 
 export default function UsersAdmin() {

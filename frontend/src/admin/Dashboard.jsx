@@ -1,5 +1,4 @@
-import { motion } from 'framer-motion';
-import { Package, Plus, RefreshCw, BarChart3, Users, ClipboardList } from 'lucide-react';
+import { Package, RefreshCw, BarChart3, Users, ClipboardList } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import '../styles/Dashboard.css';
 

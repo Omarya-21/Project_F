@@ -1,6 +1,5 @@
 import { useAuth } from '../context/AuthContext';
-import { motion } from 'framer-motion';
-import { User, Shield, Clock, Settings, Package } from 'lucide-react';
+import { Clock, Settings, Package } from 'lucide-react';
 import '../styles/Profile.css';
 
 export default function Profile() {

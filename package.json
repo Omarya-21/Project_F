@@ -4,10 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node backend/server.js",
-    "build": "vite build --config frontend/vite.config.js",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "build": "cd frontend && npm run build",
     "start": "node backend/server.js",
-    "lint": "eslint frontend/src --config frontend/eslint.config.js"
+    "lint": "cd frontend && npm run lint"
   },
   "dependencies": {
     "@google/genai": "^1.29.0",
@@ -17,6 +19,7 @@
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.9.0",
     "clsx": "^2.1.1",
+    "concurrently": "^9.2.1",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^4.22.1",

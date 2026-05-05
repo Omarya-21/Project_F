@@ -1,38 +1,25 @@
 import express from 'express';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { createServer as createViteServer } from 'vite';
+import cors from 'cors';
+import dotenv from 'dotenv';
 import backendApp from './app.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+dotenv.config();
 
-async function startServer() {
-  const app = express();
-  const PORT = 3000;
+const app = express();
+const PORT = process.env.PORT || 5000;
 
-  // Mount backend API routes
-  app.use(backendApp);
+// Middleware
+app.use(cors());
+app.use(express.json());
 
-  if (process.env.NODE_ENV !== 'production') {
-    const vite = await createViteServer({
-      configFile: path.resolve(process.cwd(), 'frontend/vite.config.js'),
-      server: { middlewareMode: true },
-      appType: 'spa',
-    });
-    app.use(vite.middlewares);
-  } else {
-    // In production, serve the built frontend
-    const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
-    });
-  }
+// Mount backend API routes
+app.use(backendApp);
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
-  });
-}
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', service: 'nexus-backend' });
+});
 
-startServer();
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Backend API running on http://localhost:${PORT}`);
+});

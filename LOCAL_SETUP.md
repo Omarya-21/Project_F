@@ -29,29 +29,20 @@ Follow these steps to run the application on your computer using XAMPP and MySQL
    ```
    *Note: If you have a different MySQL user/password in XAMPP, update them here.*
 
-## 3. Installation
-Open your terminal in the root project folder and run:
-```bash
-# Install root dependencies
-npm install
+## 3. Installation & Running
+Since these are separated projects, you will manage them in two different terminal windows.
 
-# Install frontend dependencies
-cd frontend
-npm install
+### A. Backend (The Server)
+1. Open a terminal in the `backend` folder.
+2. Run: `npm install`
+3. Run: `npm start` (or `node app.js`)
+   - *Note: The server will automatically create your database tables on the first run.*
 
-# Install backend dependencies
-cd ../backend
-npm install
-```
-
-## 4. Running the Application
-Return to the root folder and run:
-```bash
-npm run dev
-```
-Wait a few seconds until you see both servers start.
-- Frontend will be at: `http://localhost:5173` (or similar)
-- Backend will be at: `http://localhost:3000`
+### B. Frontend (The User Interface)
+1. Open a **new** terminal in the `frontend` folder.
+2. Run: `npm install`
+3. Run: `npm run dev`
+4. Open the link shown (usually `http://localhost:5173`).
 
 ## 5. Admin Access
 The **first user** who registers on the site will automatically be granted **Admin** rights. 

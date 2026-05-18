@@ -12,6 +12,7 @@ import RamPage from './pages/store/Ram';
 import RomPage from './pages/store/Rom';
 import PSUPage from './pages/store/PSU';
 import CasesPage from './pages/store/Cases';
+import MotherboardsPage from './pages/store/Motherboards';
 import ScreensPage from './pages/store/Screens';
 import MousesPage from './pages/store/Mouses';
 import KeyboardsPage from './pages/store/Keyboards';
@@ -57,6 +58,7 @@ export default function App() {
                 <Route path="/store/rom" element={<RomPage />} />
                 <Route path="/store/psu" element={<PSUPage />} />
                 <Route path="/store/cases" element={<CasesPage />} />
+                <Route path="/store/motherboards" element={<MotherboardsPage />} />
                 <Route path="/store/screens" element={<ScreensPage />} />
                 <Route path="/store/mouses" element={<MousesPage />} />
                 <Route path="/store/keyboards" element={<KeyboardsPage />} />

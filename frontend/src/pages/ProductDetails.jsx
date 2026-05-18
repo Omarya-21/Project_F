@@ -48,7 +48,7 @@ export default function ProductDetails() {
             <img 
               src={product.image} 
               alt={product.name} 
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain p-8"
               referrerPolicy="no-referrer"
             />
           ) : (
@@ -70,7 +70,7 @@ export default function ProductDetails() {
             <div className="mb-8 p-6 bg-gray-900 border border-gray-800 rounded-2xl">
               <h3 className="text-xs font-black text-blue-500 uppercase tracking-widest mb-4">Technical Specifications</h3>
               <div className="grid grid-cols-2 gap-4">
-                {Object.entries(JSON.parse(product.specs)).map(([key, value]) => (
+                {Object.entries(typeof product.specs === 'string' ? JSON.parse(product.specs) : (product.specs || {})).map(([key, value]) => (
                   <div key={key} className="flex flex-col">
                     <span className="text-[10px] text-gray-500 uppercase font-bold">{key.replace('_', ' ')}</span>
                     <span className="text-sm text-white font-medium">{value}</span>

@@ -7,12 +7,12 @@ import { Cpu, Layout, Disc, Activity, Zap, HardDrive, Monitor, Mouse, Keyboard, 
 const categoryIcons = {
   CPU: <Cpu size={40} />,
   GPU: <Activity size={40} />,
-  Motherboard: <Layout size={40} />,
+  Motherboards: <Layout size={40} />,
   Ram: <Disc size={40} />,
   Rom: <HardDrive size={40} />,
   PSU: <Zap size={40} />,
   cases: <Activity size={40} />,
-  screens: <Monitor size={40} />,
+  Monitors: <Monitor size={40} />,
   mouses: <Mouse size={40} />,
   keyboards: <Keyboard size={40} />,
   headphones: <Headphones size={40} />,
@@ -24,12 +24,12 @@ const categoryIcons = {
 const categoryNames = {
   CPU: 'Processors',
   GPU: 'Graphics Cards',
-  Motherboard: 'Motherboards',
+  Motherboards: 'Motherboards',
   Ram: 'Memory (RAM)',
   Rom: 'Storage (ROM/SSD)',
   PSU: 'Power Supplies',
   cases: 'Chassis & Cases',
-  screens: 'Gaming Monitors',
+  Monitors: 'Gaming Monitors',
   mouses: 'Gaming Mice',
   keyboards: 'Mechanical Keyboards',
   headphones: 'Audio & Headsets',
@@ -49,7 +49,9 @@ export default function CategoryProducts({ categoryOverride }) {
       setLoading(true);
       try {
         const allProducts = await getProducts();
-        const filtered = allProducts.filter(p => p.category === categoryName);
+        const filtered = allProducts.filter(p => 
+          p.category?.toLowerCase() === categoryName?.toLowerCase()
+        );
         setProducts(filtered);
       } catch (err) {
         console.error(err);
@@ -71,11 +73,15 @@ export default function CategoryProducts({ categoryOverride }) {
     <div className="pt-24 pb-20 px-4 max-w-7xl mx-auto">
       <header className="mb-12 flex items-center gap-6">
         <div className="w-20 h-20 bg-blue-600/10 border border-blue-500/20 rounded-2xl flex items-center justify-center text-blue-500">
-          {categoryIcons[categoryName] || <Cpu size={40} />}
+          {categoryIcons[categoryName] || 
+           categoryIcons[Object.keys(categoryIcons).find(k => k.toLowerCase() === categoryName?.toLowerCase())] || 
+           <Cpu size={40} />}
         </div>
         <div>
           <h1 className="text-4xl font-black text-white italic uppercase tracking-tighter">
-            {categoryNames[categoryName] || categoryName}
+            {categoryNames[categoryName] || 
+             categoryNames[Object.keys(categoryNames).find(k => k.toLowerCase() === categoryName?.toLowerCase())] || 
+             categoryName}
           </h1>
           <p className="text-gray-400 mt-2">
             Explore our elite selection of high-performance {categoryName} hardware.

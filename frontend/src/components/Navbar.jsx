@@ -21,6 +21,7 @@ export default function Navbar() {
               <div className="px-6 pb-2 text-[10px] text-gray-500 font-black uppercase tracking-[0.2em]">Components</div>
               <Link to="/store/cpu" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Processors (CPU)</Link>
               <Link to="/store/gpu" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Graphics Cards (GPU)</Link>
+              <Link to="/store/motherboards" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Motherboards</Link>
               <Link to="/store/ram" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Memory (RAM)</Link>
               <Link to="/store/rom" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Storage (SSD/HDD)</Link>
               <Link to="/store/psu" className="px-6 py-2 hover:bg-blue-600/10 hover:text-blue-500 transition-colors">Power Supplies</Link>

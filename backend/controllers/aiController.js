@@ -9,8 +9,10 @@ const getAIClient = () => {
   if (!aiClient) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
+      console.error("GEMINI_API_KEY is missing from environment variables");
       throw new Error("GEMINI_API_KEY is not set in backend environment");
     }
+    console.log("GEMINI_API_KEY is present, initializing AI client");
     aiClient = new GoogleGenAI({
       apiKey: apiKey,
       httpOptions: {

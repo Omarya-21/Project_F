@@ -39,7 +39,7 @@ pool = connectMySQL();
 if (!pool) {
   console.log('📦 Using SQLite fallback for data persistence');
   isSQLite = true;
-  const dbPath = path.resolve(__dirname, '../../backend/database/nexus_v4.db');
+  const dbPath = path.resolve(__dirname, '../../backend/database/nexus_v6.db');
   
   // Ensure database directory exists synchronously
   const dir = path.dirname(dbPath);

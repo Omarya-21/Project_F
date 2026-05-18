@@ -27,12 +27,7 @@ export default function ReviewSection({ productID }) {
   }, [productID]);
 
   useEffect(() => {
-    let isMounted = true;
-    const load = async () => {
-      await fetchReviews();
-    };
-    load();
-    return () => { isMounted = false; };
+    fetchReviews();
   }, [fetchReviews]);
 
   const handleSubmit = async (e) => {

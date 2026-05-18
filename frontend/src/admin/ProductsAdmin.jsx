@@ -25,17 +25,17 @@ export default function ProductsAdmin() {
 
   return (
     <div className="pt-24 pb-20">
-      <h1 className="text-3xl font-black mb-10 text-white italic uppercase tracking-widest">Inventory Management</h1>
+      <h1 className="text-3xl font-black mb-10 text-white italic uppercase tracking-widest">Manage Products</h1>
       
       <div className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1 bg-gray-900 border border-gray-800 p-8 rounded-3xl h-fit">
           <h2 className="text-xl font-black mb-6 uppercase flex items-center gap-2 italic">
-            <Plus size={20} className="text-blue-500" /> New Logistics Entry
+            <Plus size={20} className="text-blue-500" /> Add New Product
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <input 
               type="text" 
-              placeholder="Hardware Name" 
+              placeholder="Product Name" 
               className="w-full bg-black border border-gray-800 rounded-lg p-3 text-white focus:border-blue-500 outline-none"
               value={newProduct.name}
               onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
@@ -44,7 +44,7 @@ export default function ProductsAdmin() {
             <div className="grid grid-cols-2 gap-4">
               <input 
                 type="number" 
-                placeholder="Unit Price" 
+                placeholder="Price" 
                 className="bg-black border border-gray-800 rounded-lg p-3 text-white focus:border-blue-500 outline-none"
                 value={newProduct.price}
                 onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
@@ -52,7 +52,7 @@ export default function ProductsAdmin() {
               />
               <input 
                 type="number" 
-                placeholder="Qty" 
+                placeholder="Stock" 
                 className="bg-black border border-gray-800 rounded-lg p-3 text-white focus:border-blue-500 outline-none"
                 value={newProduct.stock}
                 onChange={(e) => setNewProduct({...newProduct, stock: e.target.value})}
@@ -68,7 +68,7 @@ export default function ProductsAdmin() {
               required
             />
             <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-xl transition-all uppercase tracking-widest italic">
-              Authorize Stock
+              Add Product
             </button>
           </form>
         </div>
@@ -77,8 +77,8 @@ export default function ProductsAdmin() {
           <table className="w-full text-left">
             <thead>
               <tr className="text-gray-500 text-[10px] uppercase tracking-[0.2em] font-black border-b border-gray-800">
-                <th className="pb-4">Hardware</th>
-                <th className="pb-4">Sector</th>
+                <th className="pb-4">Name</th>
+                <th className="pb-4">Category</th>
                 <th className="pb-4">Stock</th>
                 <th className="pb-4 text-right">Actions</th>
               </tr>

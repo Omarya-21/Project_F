@@ -13,8 +13,8 @@ export default function Cart() {
       <div className="pt-40 pb-20 flex flex-col items-center justify-center text-center px-4">
         <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
           <ShoppingBag size={80} className="text-gray-800 mb-8" />
-          <h2 className="text-4xl font-black text-white mb-4 uppercase italic">Cart is Empty</h2>
-          <p className="text-gray-500 mb-10 max-w-sm">No hardware detected in the deployment queue. Return to inventory to source components.</p>
+          <h2 className="text-4xl font-black text-white mb-4 uppercase italic">Your cart is empty</h2>
+          <p className="text-gray-500 mb-10 max-w-sm">Looks like you haven't added any parts yet. Browse our inventory to find what you need.</p>
           <Link to="/products" className="bg-white text-black px-8 py-4 rounded-full font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all">
             Browse Inventory
           </Link>
@@ -25,7 +25,7 @@ export default function Cart() {
 
   return (
     <div className="pt-24 pb-20">
-      <h1 className="text-4xl font-black mb-12 text-white border-l-4 border-blue-600 pl-4 uppercase italic">Deployment Queue</h1>
+      <h1 className="text-4xl font-black mb-12 text-white border-l-4 border-blue-600 pl-4 uppercase italic">Your Shopping Cart</h1>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         <div className="lg:col-span-2 space-y-4">
@@ -96,11 +96,11 @@ export default function Cart() {
               </div>
             </div>
             <div className="flex justify-between items-center pt-6 border-t border-gray-800 mb-8">
-              <span className="text-lg font-black uppercase tracking-[0.2em] italic">Total Ops</span>
+              <span className="text-lg font-black uppercase tracking-[0.2em] italic">Total</span>
               <span className="text-3xl font-black text-blue-500">{formatPrice(subtotal)}</span>
             </div>
             <Link to="/checkout" className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 transition-all transform hover:scale-[1.02] active:scale-95 uppercase tracking-widest">
-              Initiate Checkout <ArrowRight size={22} />
+              Proceed to Checkout <ArrowRight size={22} />
             </Link>
           </div>
         </div>

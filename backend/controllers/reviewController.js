@@ -5,14 +5,15 @@ export const addReview = async (req, res) => {
   const userID = req.user.id;
 
   if (!productID || !rating) {
-    return res.status(400).json({ message: 'Product ID and rating are required' });
+    return res.status(400).json({ message: 'Rating and product ID are required' });
   }
 
   try {
     const reviewID = await ReviewModel.createReview(userID, productID, rating, comment);
-    res.status(201).json({ reviewID, message: 'Review added successfully' });
+    res.status(201).json({ id: reviewID, message: 'Thanks for your review!' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('❌ Error adding review:', error);
+    res.status(500).json({ message: 'Failed to save your review' });
   }
 };
 

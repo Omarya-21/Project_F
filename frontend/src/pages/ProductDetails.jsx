@@ -30,7 +30,7 @@ export default function ProductDetails() {
   }, [id]);
 
   if (loading) return <div className="pt-32"><Loader /></div>;
-  if (!product) return <div className="pt-32 text-center text-red-500 font-bold">ERROR: HARDWARE SEGMENT NOT FOUND</div>;
+  if (!product) return <div className="pt-32 text-center text-red-500 font-bold">Sorry, we couldn't find this product.</div>;
 
   return (
     <div className="pt-24 pb-20 px-4 max-w-7xl mx-auto">
@@ -60,10 +60,10 @@ export default function ProductDetails() {
            initial={{ opacity: 0, x: 20 }}
            animate={{ opacity: 1, x: 0 }}
         >
-          <span className="text-blue-500 font-black text-xs tracking-[0.3em] uppercase mb-4 block italic">Authorized Component</span>
+          <span className="text-blue-500 font-black text-xs tracking-[0.3em] uppercase mb-4 block italic">Premium Quality</span>
           <h1 className="text-4xl md:text-5xl font-black text-white mb-4 uppercase italic leading-tight">{product.name}</h1>
           <p className="text-gray-400 text-lg mb-4 leading-relaxed">
-            {product.description || 'Advanced hardware architecture designed for high-performance computing environments. Nexus certified and stress-tested for maximum stability and speed.'}
+            {product.description || 'Professional-grade component designed for maximum stability and speed.'}
           </p>
 
           {product.specs && (
@@ -92,7 +92,7 @@ export default function ProductDetails() {
             disabled={product.stock === 0}
             className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-gray-800 disabled:text-gray-600 text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 transition-all transform hover:scale-[1.02] active:scale-95 uppercase tracking-widest"
           >
-            <ShoppingCart size={24} /> Deploy to Cart
+            <ShoppingCart size={24} /> Add to Cart
           </button>
 
           <div className="grid grid-cols-3 gap-4 mt-12 pt-12 border-t border-gray-800">

@@ -8,20 +8,24 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const initAuth = async () => {
+    async function recoverSession() {
       const token = localStorage.getItem('token');
-      if (token) {
-        try {
-          const userData = await authService.getMe();
-          setUser(userData);
-        } catch (err) {
-          console.error("Auth init failure:", err);
-          localStorage.removeItem('token');
-        }
+      if (!token) {
+        setLoading(false);
+        return;
       }
-      setLoading(false);
-    };
-    initAuth();
+
+      try {
+        const userData = await authService.getMe();
+        setUser(userData);
+      } catch (err) {
+        console.error("Session recovery failed:", err);
+        localStorage.removeItem('token');
+      } finally {
+        setLoading(false);
+      }
+    }
+    recoverSession();
   }, []);
 
   const login = async (credentials) => {

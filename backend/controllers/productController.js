@@ -21,11 +21,11 @@ export const getProductById = async (req, res) => {
 };
 
 export const addProduct = async (req, res) => {
-  const { name, brand, price, stock, category, image, description } = req.body;
   try {
-    const id = await ProductModel.createProduct(name, brand, price, stock, category, image, description);
-    res.status(201).json({ id, name, brand, price, stock, category, image, description });
+    const productId = await ProductModel.createProduct(req.body);
+    res.status(201).json({ id: productId, ...req.body });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('❌ Error adding product:', error);
+    res.status(500).json({ error: 'Could not add product' });
   }
 };

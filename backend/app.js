@@ -12,8 +12,13 @@ app.use(cors());
 app.use(express.json());
 
 // Initialize DB tables
-initDb().then(() => console.log('Products table initialized')).catch(console.error);
-initUserTable().then(() => console.log('Users table initialized')).catch(console.error);
+initDb()
+  .then(() => console.log('✅ Products table ready'))
+  .catch(err => console.error('❌ Products table error:', err));
+
+initUserTable()
+  .then(() => console.log('✅ Users table ready'))
+  .catch(err => console.error('❌ Users table error:', err));
 
 // API Routes
 app.use('/api/products', productRoutes);

@@ -21,16 +21,16 @@ export default function Products() {
     fetch();
   }, []);
 
-  if (loading) return <div className="pt-24 text-center">Deploying Hardware...</div>;
+  if (loading) return <div className="pt-24 text-center text-gray-400">Loading the latest parts...</div>;
 
   return (
     <div className="pt-24 pb-20">
-      <h2 className="text-3xl font-black mb-10 text-white border-l-4 border-blue-600 pl-4">CURRENT INVENTORY</h2>
+      <h2 className="text-3xl font-black mb-10 text-white border-l-4 border-blue-600 pl-4 uppercase tracking-tight">Our Inventory</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {products.map((p) => (
           <ProductCard key={p.id} product={p} />
         ))}
-        {products.length === 0 && <p className="text-gray-500 col-span-full">No hardware detected in local sectors.</p>}
+        {products.length === 0 && <p className="text-gray-500 col-span-full">Nothing found in our shop right now.</p>}
       </div>
     </div>
   );

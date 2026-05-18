@@ -84,7 +84,7 @@ export default function CategoryProducts({ categoryOverride }) {
              categoryName}
           </h1>
           <p className="text-gray-400 mt-2">
-            Explore our elite selection of high-performance {categoryName} hardware.
+            Browse through our collection of high-performance {categoryName} hardware.
           </p>
         </div>
       </header>
@@ -105,7 +105,7 @@ export default function CategoryProducts({ categoryOverride }) {
                 </h2>
                 <div className="h-px bg-gray-800 grow"></div>
                 <span className="text-[10px] font-black bg-gray-800 text-gray-400 px-3 py-1 rounded-full uppercase tracking-widest">
-                  {brandProducts.length} Units
+                  {brandProducts.length} {brandProducts.length === 1 ? 'Item' : 'Items'}
                 </span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -118,7 +118,7 @@ export default function CategoryProducts({ categoryOverride }) {
         </div>
       ) : (
         <div className="text-center py-20 bg-gray-900 rounded-3xl border border-gray-800">
-          <p className="text-gray-500 text-lg">No components found in this category.</p>
+          <p className="text-gray-500 text-lg">We don't have anything in this category yet.</p>
         </div>
       )}
     </div>

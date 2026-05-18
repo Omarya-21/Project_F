@@ -54,7 +54,7 @@ export const getProductById = async (id) => {
   return rows[0];
 };
 
-export const createProduct = async (name, brand, price, stock, category, image, description) => {
+export const createProduct = async ({ name, brand, price, stock, category, image, description, specs = {} }) => {
   // Ensure Brand exists
   let [brandRows] = await db.query('SELECT brandID FROM Brands WHERE brand_name = ?', [brand]);
   let brandID;
@@ -79,7 +79,15 @@ export const createProduct = async (name, brand, price, stock, category, image, 
     'INSERT INTO Products (name, price, stock, description, image_url, brandID, categoryID) VALUES (?, ?, ?, ?, ?, ?, ?)',
     [name, price, stock, description, image, brandID, categoryID]
   );
-  return result.insertId;
+  
+  const productId = result.insertId;
+  
+  // Insert specs if provided
+  for (const [key, value] of Object.entries(specs)) {
+    await db.query('INSERT INTO ProductSpecs (productID, spec_key, value) VALUES (?, ?, ?)', [productId, key, String(value)]);
+  }
+  
+  return productId;
 };
 
 export const initDb = async () => {
@@ -140,11 +148,10 @@ export const initDb = async () => {
     ];
 
     for (const p of seedProducts) {
-      const productId = await createProduct(p.name, p.brand, p.price, p.stock, p.category, p.image, `${p.brand} ${p.name} - High quality PC component.`);
-      // Add specs
-      for (const [key, value] of Object.entries(p.specs)) {
-        await db.query('INSERT INTO ProductSpecs (productID, spec_key, value) VALUES (?, ?, ?)', [productId, key, String(value)]);
-      }
+      await createProduct({
+        ...p,
+        description: `${p.brand} ${p.name} - Professional grade PC component.`
+      });
     }
   }
 };

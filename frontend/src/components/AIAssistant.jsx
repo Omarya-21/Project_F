@@ -9,7 +9,7 @@ import axios from 'axios';
 export default function AIAssistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'model', parts: [{ text: "Hello! I'm your Nexus PC Build Assistant. How can I help you choose the right parts today?" }] }
+    { role: 'assistant', content: "Hello! I'm your Nexus PC Build Assistant. How can I help you choose the right parts today?" }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -44,25 +44,24 @@ export default function AIAssistant() {
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    const query = input.trim();
+    if (!query || isLoading) return;
 
-    const userMessage = { role: 'user', parts: [{ text: input }] };
-    setMessages(prev => [...prev, userMessage]);
+    // Add user message
+    const userMsg = { role: 'user', content: query };
+    setMessages(prev => [...prev, userMsg]);
     setInput('');
     setIsLoading(true);
 
     try {
-      // Filter out any irrelevant messages or format them for the API
-      const history = messages.map(m => ({
-        role: m.role,
-        parts: m.parts
-      }));
-      
-      const response = await getBuildAdvice([...history, userMessage], products);
-      setMessages(prev => [...prev, { role: 'model', parts: [{ text: response }] }]);
+      const response = await getBuildAdvice([...messages, userMsg], products);
+      setMessages(prev => [...prev, { role: 'assistant', content: response }]);
     } catch (err) {
-      console.error("AI Assistant error:", err);
-      setMessages(prev => [...prev, { role: 'model', parts: [{ text: "Sorry, I encountered an error. Please try again later." }] }]);
+      console.error("Assistant Error:", err);
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: "I ran into a bit of trouble. Could you try asking that again?" 
+      }]);
     } finally {
       setIsLoading(false);
     }
@@ -116,17 +115,12 @@ export default function AIAssistant() {
                       <ReactMarkdown 
                         remarkPlugins={[remarkGfm]}
                         components={{
-                          img: ({ ...props }) => (
-                            <img {...props} className="my-2 rounded-lg max-w-full h-auto border border-neutral-700 shadow-md" />
-                          ),
-                          ul: ({ ...props }) => <ul {...props} className="list-disc ml-4 mt-2 space-y-1" />,
-                          ol: ({ ...props }) => <ol {...props} className="list-decimal ml-4 mt-2 space-y-1" />,
-                          p: ({ ...props }) => <p {...props} className="mb-2 last:mb-0" />,
-                          strong: ({ ...props }) => <strong {...props} className="font-bold text-blue-400" />,
-                          a: ({ ...props }) => <a {...props} className="text-blue-400 hover:underline underline-offset-4" target="_blank" rel="noopener noreferrer" />
+                          img: (props) => <img {...props} className="my-2 rounded-lg max-w-full h-auto" />,
+                          strong: (props) => <strong {...props} className="font-bold text-blue-400" />,
+                          a: (props) => <a {...props} className="text-blue-400 hover:underline" target="_blank" />
                         }}
                       >
-                        {msg.parts[0].text}
+                        {msg.content}
                       </ReactMarkdown>
                     </div>
                   </div>

@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Bot, X, Send, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { getBuildAdvice } from '../services/geminiService';
 import axios from 'axios';
 
@@ -67,57 +69,79 @@ export default function AIAssistant() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-6 right-6 z-50 font-sans">
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="mb-4 w-[350px] sm:w-[400px] h-[500px] bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+            className="mb-4 w-[350px] sm:w-[450px] h-[600px] bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden"
           >
             {/* Header */}
-            <div className="p-4 bg-blue-600 flex items-center justify-between">
+            <div className="p-4 bg-blue-600 flex items-center justify-between shadow-lg">
               <div className="flex items-center gap-2">
-                <Bot size={20} className="text-white" />
-                <h3 className="font-semibold text-white">Build Assistant</h3>
+                <div className="bg-white/20 p-1.5 rounded-lg">
+                  <Bot size={20} className="text-white" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-white text-sm">Nexus Build Expert</h3>
+                  <div className="flex items-center gap-1">
+                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+                    <span className="text-[10px] text-white/70">Online & Ready</span>
+                  </div>
+                </div>
               </div>
               <button 
                 onClick={() => setIsOpen(false)}
-                className="text-white/80 hover:text-white transition-colors"
+                className="bg-white/10 hover:bg-white/20 p-2 rounded-lg text-white transition-all"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
             {/* Messages */}
-            <div className="flex-grow p-4 overflow-y-auto space-y-4 scrollbar-thin scrollbar-thumb-neutral-800">
+            <div className="flex-grow p-4 overflow-y-auto space-y-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-neutral-800">
               {messages.map((msg, idx) => (
                 <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`flex gap-2 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${msg.role === 'user' ? 'bg-blue-600' : 'bg-neutral-800'}`}>
-                      {msg.role === 'user' ? <User size={16} /> : <Bot size={16} />}
+                  <div className={`flex gap-3 max-w-[90%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-sm ${msg.role === 'user' ? 'bg-blue-600' : 'bg-neutral-800 border border-neutral-700'}`}>
+                      {msg.role === 'user' ? <User size={16} className="text-white" /> : <Bot size={16} className="text-blue-400" />}
                     </div>
-                    <div className={`p-3 rounded-2xl text-sm ${
+                    <div className={`p-3 rounded-2xl text-sm leading-relaxed shadow-sm ${
                       msg.role === 'user' 
                         ? 'bg-blue-600 text-white rounded-tr-none' 
-                        : 'bg-neutral-800 text-neutral-200 rounded-tl-none'
+                        : 'bg-neutral-800 text-neutral-200 rounded-tl-none border border-neutral-700/50'
                     }`}>
-                      {msg.parts[0].text}
+                      <ReactMarkdown 
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          img: ({ ...props }) => (
+                            <img {...props} className="my-2 rounded-lg max-w-full h-auto border border-neutral-700 shadow-md" />
+                          ),
+                          ul: ({ ...props }) => <ul {...props} className="list-disc ml-4 mt-2 space-y-1" />,
+                          ol: ({ ...props }) => <ol {...props} className="list-decimal ml-4 mt-2 space-y-1" />,
+                          p: ({ ...props }) => <p {...props} className="mb-2 last:mb-0" />,
+                          strong: ({ ...props }) => <strong {...props} className="font-bold text-blue-400" />,
+                          a: ({ ...props }) => <a {...props} className="text-blue-400 hover:underline underline-offset-4" target="_blank" rel="noopener noreferrer" />
+                        }}
+                      >
+                        {msg.parts[0].text}
+                      </ReactMarkdown>
                     </div>
                   </div>
                 </div>
               ))}
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="flex gap-2 max-w-[85%]">
-                    <div className="w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center shrink-0">
-                      <Bot size={16} />
+                  <div className="flex gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-neutral-800 border border-neutral-700 flex items-center justify-center shrink-0">
+                      <Bot size={16} className="text-blue-400" />
                     </div>
-                    <div className="p-3 rounded-2xl bg-neutral-800 text-neutral-200 rounded-tl-none flex gap-1">
-                      <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1 }} className="w-1.5 h-1.5 bg-neutral-500 rounded-full" />
-                      <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-1.5 h-1.5 bg-neutral-500 rounded-full" />
-                      <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-1.5 h-1.5 bg-neutral-500 rounded-full" />
+                    <div className="p-4 rounded-2xl bg-neutral-800 text-neutral-200 rounded-tl-none border border-neutral-700/50 flex gap-1.5 items-center">
+                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" />
                     </div>
                   </div>
                 </div>
@@ -126,23 +150,26 @@ export default function AIAssistant() {
             </div>
 
             {/* Input */}
-            <form onSubmit={handleSend} className="p-4 border-t border-neutral-800">
+            <form onSubmit={handleSend} className="p-4 border-t border-neutral-800 bg-neutral-900/50 backdrop-blur-sm">
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask about compatibility..."
-                  className="flex-grow bg-neutral-800 border border-neutral-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors"
+                  placeholder="Ask about compatibility or parts..."
+                  className="flex-grow bg-neutral-800/80 border border-neutral-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all placeholder:text-neutral-500"
                 />
                 <button
                   type="submit"
                   disabled={isLoading || !input.trim()}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed p-2 rounded-xl text-white transition-colors"
+                  className="bg-blue-600 hover:bg-blue-700 active:scale-95 disabled:opacity-50 disabled:scale-100 disabled:cursor-not-allowed p-2.5 rounded-xl text-white transition-all shadow-lg shadow-blue-600/20"
                 >
                   <Send size={18} />
                 </button>
               </div>
+              <p className="text-[10px] text-neutral-500 mt-2 text-center">
+                Powered by Gemini AI • Nexus Inventory Aware
+              </p>
             </form>
           </motion.div>
         )}
@@ -152,7 +179,9 @@ export default function AIAssistant() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="w-14 h-14 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-700 transition-colors"
+        className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 ${
+          isOpen ? 'bg-neutral-800 text-white rotate-90' : 'bg-blue-600 text-white hover:bg-blue-700'
+        }`}
       >
         {isOpen ? <X size={24} /> : <Bot size={24} />}
       </motion.button>

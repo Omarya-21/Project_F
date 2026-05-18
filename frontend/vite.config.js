@@ -9,9 +9,6 @@ const __dirname = path.dirname(__filename);
 
 export default defineConfig({
   root: __dirname,
-  define: {
-    'process.env.GEMINI_API_KEY': JSON.stringify(process.env.GEMINI_API_KEY)
-  },
   plugins: [
     react(),
     tailwindcss(),

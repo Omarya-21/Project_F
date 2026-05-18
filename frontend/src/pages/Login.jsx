@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
-import '../styles/Login.css';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -13,50 +12,66 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     try {
       await login({ email, password });
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      setError(err.response?.data?.message || 'Login failed. Please try again.');
     }
   };
 
   return (
     <div className="pt-32 flex justify-center px-4">
       <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-md bg-gray-900 border border-gray-800 p-8 rounded-2xl"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-md bg-gray-900 border border-gray-800 p-8 rounded-2xl shadow-xl"
       >
-        <h2 className="text-3xl font-black mb-6 text-white text-center italic">SYSTEM LOGON</h2>
-        {error && <div className="bg-red-500/10 border border-red-500 text-red-500 p-3 rounded mb-4 text-sm">{error}</div>}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-white mb-2">Welcome Back</h2>
+          <p className="text-gray-400">Enter your credentials to access your account</p>
+        </div>
+
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-4 rounded-xl mb-6 text-sm">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-xs uppercase tracking-widest text-gray-500 mb-2 font-bold">Email Address</label>
+            <label className="block text-sm font-medium text-gray-400 mb-2">Email Address</label>
             <input 
               type="email" 
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white focus:border-blue-500 outline-none transition-colors"
+              className="w-full bg-gray-800/50 border border-gray-700 rounded-xl p-4 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              placeholder="name@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
           <div>
-            <label className="block text-xs uppercase tracking-widest text-gray-500 mb-2 font-bold">Password</label>
+            <label className="block text-sm font-medium text-gray-400 mb-2">Password</label>
             <input 
               type="password" 
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white focus:border-blue-500 outline-none transition-colors"
+              className="w-full bg-gray-800/50 border border-gray-700 rounded-xl p-4 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
-          <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-lg mt-4 transition-colors uppercase tracking-widest">
-            Authenticate
+          <button 
+            type="submit" 
+            className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl mt-4 transition-all active:scale-[0.98]"
+          >
+            Login
           </button>
         </form>
-        <p className="mt-6 text-center text-gray-500 text-sm">
-          New build? <Link to="/register" className="text-blue-500 hover:underline">Register Sector</Link>
+
+        <p className="mt-8 text-center text-gray-500">
+          Don't have an account? <Link to="/register" className="text-blue-500 hover:text-blue-400 font-medium">Sign up</Link>
         </p>
       </motion.div>
     </div>

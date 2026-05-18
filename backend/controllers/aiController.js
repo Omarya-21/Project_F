@@ -27,44 +27,35 @@ const getAIClient = () => {
 
 export const getAdvice = async (req, res) => {
   const { messages, products } = req.body;
+  console.log("🤖 Generating AI advice...");
 
   try {
     const ai = getAIClient();
+    const model = ai.getGenerativeModel({ 
+      model: "gemini-1.5-flash",
+      systemInstruction: `You are a Nexus PC Build Assistant. Help customers choose compatible PC parts.
+      
+      Inventory: ${JSON.stringify(products || [])}
+      
+      Rules:
+      1. Sockets must match (LGA1700, AM5).
+      2. RAM type must match (DDR4/DDR5).
+      3. PSU should have 20% headroom.
+      4. Be direct and helpful like a professional builder.`
+    });
     
-    // Format full conversation for Gemini SDK
+    // Map roles to Gemini format: 'assistant' -> 'model', 'user' -> 'user'
     const contents = (messages || []).map(m => ({
-      role: m.role === 'model' ? 'model' : 'user',
-      parts: [{ text: m.parts?.[0]?.text || m.content || "" }]
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content || "" }]
     }));
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: contents,
-      config: {
-        systemInstruction: `
-          You are a Nexus PC Build Assistant. Your goal is to help customers choose compatible PC parts from our inventory.
-          
-          Here is our current inventory of products with their technical specifications:
-          ${JSON.stringify(products, null, 2)}
-          
-          Key Compatibility Rules you must enforce:
-          1. CPU & Motherboard must have matching Sockets (e.g., LGA1700, AM5).
-          2. RAM must match Motherboard type (DDR4 or DDR5).
-          3. PSU wattage should be at least 20-30% higher than the GPU's power requirement.
-          4. Motherboard Form Factor must fit in the Case.
-          
-          When recommending products:
-          - Use the exact name from the inventory.
-          - If possible, include the image URL in markdown format like ![name](url) to show the user what the part looks like.
-          
-          Be professional, technical yet accessible. Keep responses concise but helpful.
-        `,
-      }
-    });
-
-    res.json({ text: response.text });
+    const result = await model.generateContent({ contents });
+    const text = result.response.text();
+    
+    res.json({ text });
   } catch (error) {
-    console.error("AI Controller Error:", error);
-    res.status(500).json({ error: error.message || "Failed to get AI advice" });
+    console.error("❌ AI Error:", error);
+    res.status(500).json({ error: "I'm having trouble thinking right now. Please try again." });
   }
 };

@@ -5,8 +5,8 @@ export const getProducts = async (req, res) => {
     const products = await ProductModel.getAllProducts();
     res.json(products);
   } catch (error) {
-    console.error('❌ Error in getProducts:', error);
-    res.status(500).json({ error: error.message, stack: error.stack });
+    console.error('❌ Error getting products:', error);
+    res.status(500).json({ error: 'Failed to fetch products' });
   }
 };
 

@@ -11,8 +11,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-// Use 5000 in dev (proxied by Vite), or 3000 in production
-const PORT = process.env.PORT || (process.env.NODE_ENV === 'production' ? 3000 : 5000);
+// Force 5000 in dev, 3000 in production
+const PORT = process.env.NODE_ENV === 'production' ? 3000 : 5000;
 
 // Middleware
 app.use(cors());

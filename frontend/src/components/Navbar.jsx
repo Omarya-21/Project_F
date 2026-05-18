@@ -57,14 +57,14 @@ export default function Navbar() {
               <button 
                 onClick={logout}
                 className="text-gray-500 hover:text-red-500 transition-colors"
-                title="Logoff"
+                title="Logout"
               >
                 <LogOut size={16} />
               </button>
             </div>
           ) : (
             <Link to="/login" className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-full hover:bg-blue-600 hover:text-white transition-all transform hover:scale-105">
-              <LogIn size={16} /> LOGON
+              <LogIn size={16} /> LOGIN
             </Link>
           )}
         </div>

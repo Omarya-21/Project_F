@@ -38,12 +38,28 @@ Follow these steps to run the Nexus PC application on your computer. This app us
 
 You can install all dependencies and run both the frontend and backend using the root commands.
 
+### Option A: One-Command Setup (Recommended)
 1. Open a terminal in the **root** folder of the project.
 2. Run: `npm install`
    - *This will automatically install dependencies for both the frontend and backend.*
 3. Run: `npm run dev`
    - *This starts both the backend (port 3000) and the frontend concurrently.*
-4. Access the app at `http://localhost:5173` (Frontend) and `http://localhost:3000` (Backend Health Check).
+4. Access the app at `http://localhost:5173`.
+
+### Option B: Separate Terminals (For Debugging)
+If you prefer to see logs for each service separately:
+
+**1. Start the Backend:**
+- Open a terminal in the `backend` folder.
+- Run: `npm install` (first time)
+- Run: `npm start`
+- *Backend will run on http://localhost:3000*
+
+**2. Start the Frontend:**
+- Open a **new** terminal window in the `frontend` folder.
+- Run: `npm install` (first time)
+- Run: `npm run dev`
+- *Frontend will run on http://localhost:5173*
 
 ## 4. SQLite Fallback
 If MySQL is not available, the app will automatically fall back to **SQLite**. The database file will be created at `backend/database/nexus_v8.db`.

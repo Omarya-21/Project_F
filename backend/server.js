@@ -12,8 +12,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 // Use 5000 in dev (proxied by Vite), or 3000 in production
-const isProduction = process.env.NODE_ENV === 'production';
-const PORT = isProduction ? (process.env.PORT || 3000) : 5000;
+const PORT = process.env.PORT || (process.env.NODE_ENV === 'production' ? 3000 : 5000);
 
 // Middleware
 app.use(cors());
@@ -35,9 +34,25 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+import * as ProductModel from './models/productModel.js';
 // Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', service: 'nexus-backend', env: process.env.NODE_ENV });
+app.get('/health', async (req, res) => {
+  let dbStatus = 'unknown';
+  let productCount = 0;
+  try {
+    const products = await ProductModel.getAllProducts();
+    dbStatus = 'connected';
+    productCount = products.length;
+  } catch (e) {
+    dbStatus = 'error: ' + e.message;
+  }
+  res.json({ 
+    status: 'ok', 
+    service: 'nexus-backend', 
+    env: process.env.NODE_ENV,
+    db: dbStatus,
+    productCount
+  });
 });
 
 app.listen(PORT, '0.0.0.0', () => {

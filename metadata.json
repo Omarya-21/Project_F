@@ -2,5 +2,5 @@
   "name": "Omar's PC",
   "description": "Premium PC hardware and custom builds. Omar's PC offers elite components, expert compatibility advice, and high-performance computing solutions.",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

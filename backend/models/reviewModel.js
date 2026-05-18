@@ -2,7 +2,7 @@ import db from '../config/db.js';
 
 export const createReview = async (userID, productID, rating, comment) => {
   const [result] = await db.query(
-    'INSERT INTO Review (userID, productID, raiting, comment) VALUES (?, ?, ?, ?)',
+    'INSERT INTO Review (userID, productID, rating, comment) VALUES (?, ?, ?, ?)',
     [userID, productID, rating, comment]
   );
   return result.insertId;
@@ -21,7 +21,7 @@ export const getReviewsByProductId = async (productID) => {
 
 export const getAverageRating = async (productID) => {
   const [rows] = await db.query(
-    'SELECT AVG(raiting) as average FROM Review WHERE productID = ?',
+    'SELECT AVG(rating) as average FROM Review WHERE productID = ?',
     [productID]
   );
   return rows[0].average || 0;

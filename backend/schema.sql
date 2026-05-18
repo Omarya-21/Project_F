@@ -2,105 +2,105 @@
 
 -- Users Table
 CREATE TABLE IF NOT EXISTS Users (
-    userID INTEGER PRIMARY KEY AUTOINCREMENT,
-    email TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL,
-    phone TEXT,
-    name TEXT NOT NULL,
+    userID INT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
+    name VARCHAR(255) NOT NULL,
     address TEXT,
-    role TEXT DEFAULT 'user' -- Added for application logic
+    role VARCHAR(20) DEFAULT 'user'
 );
 
 -- Brands Table
 CREATE TABLE IF NOT EXISTS Brands (
-    brandID INTEGER PRIMARY KEY AUTOINCREMENT,
-    brand_name TEXT NOT NULL UNIQUE
+    brandID INT PRIMARY KEY AUTO_INCREMENT,
+    brand_name VARCHAR(255) NOT NULL UNIQUE
 );
 
 -- Category Table
 CREATE TABLE IF NOT EXISTS Category (
-    categoryID INTEGER PRIMARY KEY AUTOINCREMENT,
-    category_name TEXT NOT NULL UNIQUE
+    categoryID INT PRIMARY KEY AUTO_INCREMENT,
+    category_name VARCHAR(255) NOT NULL UNIQUE
 );
 
 -- Products Table
 CREATE TABLE IF NOT EXISTS Products (
-    productID INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
+    productID INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
     description TEXT,
-    price REAL NOT NULL,
-    stock INTEGER NOT NULL,
-    categoryID INTEGER,
-    brandID INTEGER,
-    image_url TEXT, -- Maintained for UI
+    price DECIMAL(10,2) NOT NULL,
+    stock INT NOT NULL,
+    categoryID INT,
+    brandID INT,
+    image_url TEXT,
     FOREIGN KEY (categoryID) REFERENCES Category(categoryID),
     FOREIGN KEY (brandID) REFERENCES Brands(brandID)
 );
 
--- ProductSpecs Table (Technical necessity for PC builds)
+-- ProductSpecs Table
 CREATE TABLE IF NOT EXISTS ProductSpecs (
-    specID INTEGER PRIMARY KEY AUTOINCREMENT,
-    productID INTEGER,
-    key TEXT NOT NULL,
+    specID INT PRIMARY KEY AUTO_INCREMENT,
+    productID INT,
+    spec_key VARCHAR(255) NOT NULL,
     value TEXT NOT NULL,
     FOREIGN KEY (productID) REFERENCES Products(productID)
 );
 
--- Compatibility Table (Technical necessity for AI advice)
+-- Compatibility Table
 CREATE TABLE IF NOT EXISTS Compatibility (
-    compatibilityID INTEGER PRIMARY KEY AUTOINCREMENT,
-    product1ID INTEGER,
-    product2ID INTEGER,
-    compatibility_type TEXT NOT NULL,
+    compatibilityID INT PRIMARY KEY AUTO_INCREMENT,
+    product1ID INT,
+    product2ID INT,
+    compatibility_type VARCHAR(255) NOT NULL,
     FOREIGN KEY (product1ID) REFERENCES Products(productID),
     FOREIGN KEY (product2ID) REFERENCES Products(productID)
 );
 
 -- Cart Table
 CREATE TABLE IF NOT EXISTS Cart (
-    cartID INTEGER PRIMARY KEY AUTOINCREMENT,
-    userID INTEGER,
+    cartID INT PRIMARY KEY AUTO_INCREMENT,
+    userID INT,
     FOREIGN KEY (userID) REFERENCES Users(userID)
 );
 
 -- CartItems Table
 CREATE TABLE IF NOT EXISTS CartItems (
-    cartItemID INTEGER PRIMARY KEY AUTOINCREMENT,
-    cartID INTEGER,
-    productID INTEGER,
-    quantity INTEGER NOT NULL,
+    cartItemID INT PRIMARY KEY AUTO_INCREMENT,
+    cartID INT,
+    productID INT,
+    quantity INT NOT NULL,
     FOREIGN KEY (cartID) REFERENCES Cart(cartID),
     FOREIGN KEY (productID) REFERENCES Products(productID)
 );
 
 -- Order Table
 CREATE TABLE IF NOT EXISTS Orders (
-    orderID INTEGER PRIMARY KEY AUTOINCREMENT,
-    userID INTEGER,
+    orderID INT PRIMARY KEY AUTO_INCREMENT,
+    userID INT,
     order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    total_price REAL NOT NULL,
-    status TEXT DEFAULT 'pending',
+    total_price DECIMAL(10,2) NOT NULL,
+    status VARCHAR(50) DEFAULT 'pending',
     shipping_address TEXT,
     FOREIGN KEY (userID) REFERENCES Users(userID)
 );
 
 -- Order_Item Table
 CREATE TABLE IF NOT EXISTS Order_Item (
-    orderItemID INTEGER PRIMARY KEY AUTOINCREMENT,
-    orderID INTEGER,
-    productID INTEGER,
-    quantity INTEGER NOT NULL,
-    price REAL NOT NULL,
+    orderItemID INT PRIMARY KEY AUTO_INCREMENT,
+    orderID INT,
+    productID INT,
+    quantity INT NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (orderID) REFERENCES Orders(orderID),
     FOREIGN KEY (productID) REFERENCES Products(productID)
 );
 
 -- Review Table
 CREATE TABLE IF NOT EXISTS Review (
-    reviewID INTEGER PRIMARY KEY AUTOINCREMENT,
-    userID INTEGER,
-    raiting INTEGER,
-    productID INTEGER,
+    reviewID INT PRIMARY KEY AUTO_INCREMENT,
+    userID INT,
+    rating INT,
+    productID INT,
     comment TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (userID) REFERENCES Users(userID),
@@ -109,20 +109,20 @@ CREATE TABLE IF NOT EXISTS Review (
 
 -- Payment Table
 CREATE TABLE IF NOT EXISTS Payment (
-    paymentID INTEGER PRIMARY KEY AUTOINCREMENT,
-    orderID INTEGER,
-    payment_method TEXT,
-    payment_status TEXT,
+    paymentID INT PRIMARY KEY AUTO_INCREMENT,
+    orderID INT,
+    payment_method VARCHAR(50),
+    payment_status VARCHAR(50),
     payment_date DATETIME,
     FOREIGN KEY (orderID) REFERENCES Orders(orderID)
 );
 
 -- Shipment Table
 CREATE TABLE IF NOT EXISTS Shipment (
-    shipmentID INTEGER PRIMARY KEY AUTOINCREMENT,
-    orderID INTEGER,
+    shipmentID INT PRIMARY KEY AUTO_INCREMENT,
+    orderID INT,
     delivery_address TEXT,
-    shipment_status TEXT,
+    shipment_status VARCHAR(50),
     delivery_date DATETIME,
     FOREIGN KEY (orderID) REFERENCES Orders(orderID)
 );

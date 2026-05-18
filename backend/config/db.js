@@ -14,32 +14,63 @@ let pool;
 let isSQLite = false;
 
 // Attempt to connect to MySQL
-const connectMySQL = () => {
-  try {
-    // Only try MySQL if explicit DB_HOST is provided and it's not localhost
-    if (process.env.DB_HOST && process.env.DB_HOST !== 'localhost') {
-      return mysql.createPool({
+const connectMySQL = async () => {
+  if (process.env.DB_HOST) {
+    try {
+      console.log(`🔌 Attempting to connect to MySQL at ${process.env.DB_HOST}...`);
+      const mysqlPool = mysql.createPool({
         host: process.env.DB_HOST,
         user: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
         database: process.env.DB_NAME,
         waitForConnections: true,
         connectionLimit: 10,
-        queueLimit: 0
+        queueLimit: 0,
+        connectTimeout: 5000 // 5s timeout
       });
+
+      // Test the connection
+      await mysqlPool.query('SELECT 1');
+      console.log('✅ Connected to MySQL database');
+
+      // Initialize MySQL schema if needed
+      const schemaPath = path.resolve(__dirname, '../../backend/schema.sql');
+      if (fs.existsSync(schemaPath)) {
+        const schema = fs.readFileSync(schemaPath, 'utf8');
+        // Simple split and execute for MySQL
+        const statements = schema
+          .split(';')
+          .map(s => s.trim())
+          .filter(s => s.length > 0);
+        
+        for (const statement of statements) {
+          try {
+            await mysqlPool.query(statement);
+          } catch (stmtErr) {
+            // Ignore "already exists" errors
+            if (!stmtErr.message.includes('already exists') && !stmtErr.message.includes('Table \'.*\' already exists')) {
+              console.warn('⚠️ SQL Statement Warning:', stmtErr.message);
+            }
+          }
+        }
+        console.log('✅ MySQL schema checked/initialized');
+      }
+
+      return mysqlPool;
+    } catch (err) {
+      console.error('❌ MySQL connection failed:', err.message);
+      console.log('📦 Falling back to SQLite...');
     }
-  } catch (err) {
-    console.error('MySQL connection omitted or failed, falling back to SQLite');
   }
   return null;
 };
 
-pool = connectMySQL();
+pool = await connectMySQL();
 
 if (!pool) {
   console.log('📦 Using SQLite fallback for data persistence');
   isSQLite = true;
-  const dbPath = path.resolve(__dirname, '../../backend/database/nexus_v6.db');
+  const dbPath = path.resolve(__dirname, '../database/nexus_v8.db');
   
   // Ensure database directory exists synchronously
   const dir = path.dirname(dbPath);
@@ -53,16 +84,26 @@ if (!pool) {
   const initFromFile = () => {
     try {
       const schemaPath = path.resolve(__dirname, '../../backend/schema.sql');
+      console.log(`🔍 Checking for schema at: ${schemaPath}`);
       if (fs.existsSync(schemaPath)) {
-        const schema = fs.readFileSync(schemaPath, 'utf8');
-        // Use exec for the whole schema block - it's more reliable for multiple statements
-        sqlite.exec(schema);
-        console.log('✅ Database schema initialized from schema.sql');
+        let schema = fs.readFileSync(schemaPath, 'utf8');
+        console.log(`📜 Read schema file (${schema.length} bytes)`);
+        
+        // Transform for SQLite compatibility
+        const sqliteSchema = schema
+          .replace(/INT PRIMARY KEY AUTO_INCREMENT/gi, 'INTEGER PRIMARY KEY AUTOINCREMENT')
+          .replace(/INT PRIMARY KEY/gi, 'INTEGER PRIMARY KEY')
+          .replace(/DECIMAL\(10,2\)/gi, 'DECIMAL')
+          .replace(/AUTO_INCREMENT/gi, 'AUTOINCREMENT');
+        
+        sqlite.exec(sqliteSchema);
+        console.log('✅ Database schema initialized successfully');
       } else {
         console.error('⚠️ schema.sql not found at:', schemaPath);
       }
     } catch (err) {
-      console.error('❌ Failed to initialize schema from file:', err.message);
+      console.error('❌ Failed to initialize schema:', err.message);
+      console.error('Error stack:', err.stack);
     }
   };
 

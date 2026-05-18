@@ -27,7 +27,14 @@ export default function ReviewSection({ productID }) {
   }, [productID]);
 
   useEffect(() => {
-    fetchReviews();
+    let active = true;
+    const load = async () => {
+      await fetchReviews();
+    };
+    if (active) {
+      load();
+    }
+    return () => { active = false; };
   }, [fetchReviews]);
 
   const handleSubmit = async (e) => {
@@ -151,7 +158,7 @@ export default function ReviewSection({ productID }) {
                           <Star 
                             key={s} 
                             size={10} 
-                            className={s <= rev.raiting ? 'text-blue-500 fill-blue-500' : 'text-gray-700'} 
+                            className={s <= rev.rating ? 'text-blue-500 fill-blue-500' : 'text-gray-700'} 
                           />
                         ))}
                       </div>

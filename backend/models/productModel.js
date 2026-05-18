@@ -13,11 +13,11 @@ export const getAllProducts = async () => {
     if (!rows) return [];
 
     // Fetch all specs in one go to be efficient
-    const [specRows] = await db.query('SELECT productID, "key", value FROM ProductSpecs');
+    const [specRows] = await db.query('SELECT productID, spec_key, value FROM ProductSpecs');
     const specsMap = {};
     specRows.forEach(s => {
       if (!specsMap[s.productID]) specsMap[s.productID] = {};
-      specsMap[s.productID][s.key] = s.value;
+      specsMap[s.productID][s.spec_key] = s.value;
     });
 
     const products = rows.map(p => ({
@@ -45,9 +45,9 @@ export const getProductById = async (id) => {
   `, [id]);
   
   if (rows[0]) {
-    const [specRows] = await db.query('SELECT key, value FROM ProductSpecs WHERE productID = ?', [id]);
+    const [specRows] = await db.query('SELECT spec_key, value FROM ProductSpecs WHERE productID = ?', [id]);
     const specs = {};
-    specRows.forEach(s => { specs[s.key] = s.value; });
+    specRows.forEach(s => { specs[s.spec_key] = s.value; });
     rows[0].specs = JSON.stringify(specs);
   }
   
@@ -143,7 +143,7 @@ export const initDb = async () => {
       const productId = await createProduct(p.name, p.brand, p.price, p.stock, p.category, p.image, `${p.brand} ${p.name} - High quality PC component.`);
       // Add specs
       for (const [key, value] of Object.entries(p.specs)) {
-        await db.query('INSERT INTO ProductSpecs (productID, key, value) VALUES (?, ?, ?)', [productId, key, String(value)]);
+        await db.query('INSERT INTO ProductSpecs (productID, spec_key, value) VALUES (?, ?, ?)', [productId, key, String(value)]);
       }
     }
   }

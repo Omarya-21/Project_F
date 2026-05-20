@@ -7,6 +7,10 @@ const JWT_SECRET = process.env.JWT_SECRET || 'nexus_super_secret_key';
 export const register = async (req, res) => {
   const { name, email, password } = req.body;
   
+  if (!password || password.length <= 8) {
+    return res.status(400).json({ message: 'Password must contain more than 8 characters.' });
+  }
+  
   try {
     const userExists = await UserModel.getUserByEmail(email);
     if (userExists) {
@@ -77,5 +81,37 @@ export const getMe = async (req, res) => {
   } catch (error) {
     console.error('getMe error:', error);
     res.status(500).json({ message: 'Could not fetch user data' });
+  }
+};
+
+export const getUsers = async (req, res) => {
+  try {
+    const list = await UserModel.getAllUsers();
+    res.json(list);
+  } catch (error) {
+    console.error('getUsers admin error:', error);
+    res.status(500).json({ message: 'Could not fetch users list' });
+  }
+};
+
+export const updateRole = async (req, res) => {
+  const { id } = req.params;
+  const { role } = req.body;
+  
+  if (!role || !['user', 'admin'].includes(role)) {
+    return res.status(400).json({ message: 'Invalid or missing role' });
+  }
+
+  // Prevent admin from demoting themselves by accident
+  if (parseInt(id) === req.user.id && role !== 'admin') {
+    return res.status(400).json({ message: 'You cannot remove your own admin status.' });
+  }
+
+  try {
+    await UserModel.updateUserRole(id, role);
+    res.json({ message: 'User role updated successfully' });
+  } catch (error) {
+    console.error('updateRole admin error:', error);
+    res.status(500).json({ message: 'Failed to update user role' });
   }
 };

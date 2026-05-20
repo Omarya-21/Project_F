@@ -1,13 +1,39 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Cpu, ShieldCheck, Zap, Globe, Package, Users } from 'lucide-react';
+import { getStats } from '../services/orderService';
 
 export default function About() {
+  const [dbStats, setDbStats] = useState({
+    totalUsers: 0,
+    totalOrders: 0,
+    deliveredShipments: 0,
+    totalRevenue: 0,
+  });
+
+  useEffect(() => {
+    let active = true;
+    const fetchStats = async () => {
+      try {
+        const data = await getStats();
+        if (active) {
+          setDbStats(data);
+        }
+      } catch (err) {
+        console.error("Failed to load stats on About page:", err);
+      }
+    };
+    fetchStats();
+    return () => { active = false; };
+  }, []);
+
   const stats = [
-    { label: 'Systems Built', value: '5,000+', icon: <Cpu className="text-blue-500" /> },
-    { label: 'Happy Clients', value: '4,800+', icon: <Users className="text-blue-500" /> },
-    { label: 'Global Shipping', value: '24/7', icon: <Globe className="text-blue-500" /> },
-    { label: 'Certified Parts', value: '10,000+', icon: <ShieldCheck className="text-blue-500" /> },
+    { label: 'Systems Built', value: `${dbStats.totalOrders || 0}`, icon: <Cpu className="text-blue-500" /> },
+    { label: 'Happy Clients', value: `${dbStats.totalUsers || 0}`, icon: <Users className="text-blue-500" /> },
+    { label: 'Shipments Delivered', value: `${dbStats.deliveredShipments || 0}`, icon: <Globe className="text-blue-500" /> },
+    { label: 'Certified Parts', value: '0', icon: <ShieldCheck className="text-blue-500" /> },
   ];
+
 
   return (
     <div className="pt-24 pb-20 px-4">

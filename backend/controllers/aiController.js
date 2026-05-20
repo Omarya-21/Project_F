@@ -29,18 +29,6 @@ export const getAdvice = async (req, res) => {
 
   try {
     const ai = getAIClient();
-    const model = ai.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
-      systemInstruction: `You are a Nexus PC Build Assistant. Help customers choose compatible PC parts.
-      
-      Inventory: ${JSON.stringify(products || [])}
-      
-      Rules:
-      1. Sockets must match (LGA1700, AM5).
-      2. RAM type must match (DDR4/DDR5).
-      3. PSU should have 20% headroom.
-      4. Be direct and helpful like a professional builder.`
-    });
     
     // Map roles to Gemini format: 'assistant' -> 'model', 'user' -> 'user'
     const contents = (messages || []).map(m => ({
@@ -48,8 +36,23 @@ export const getAdvice = async (req, res) => {
       parts: [{ text: m.content || "" }]
     }));
 
-    const result = await model.generateContent({ contents });
-    const text = result.response.text();
+    const response = await ai.models.generateContent({
+      model: "gemini-3.5-flash",
+      contents: contents,
+      config: {
+        systemInstruction: `You are a Nexus PC Build Assistant. Help customers choose compatible PC parts.
+        
+        Inventory: ${JSON.stringify(products || [])}
+        
+        Rules:
+        1. Sockets must match (LGA1700, AM5).
+        2. RAM type must match (DDR4/DDR5).
+        3. PSU should have 20% headroom.
+        4. Be direct and helpful like a professional builder.`
+      }
+    });
+
+    const text = response.text || "I was unable to formulate compatibility advice. Please double-check your specs manually.";
     
     res.json({ text });
   } catch (error) {

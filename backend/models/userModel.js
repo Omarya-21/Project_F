@@ -24,6 +24,15 @@ export const getUserCount = async () => {
   return rows[0].count;
 };
 
+export const getAllUsers = async () => {
+  const [rows] = await db.query('SELECT userID, name, email, phone, address, role FROM Users ORDER BY userID DESC');
+  return rows;
+};
+
+export const updateUserRole = async (userId, role) => {
+  await db.query('UPDATE Users SET role = ? WHERE userID = ?', [role, userId]);
+};
+
 export const initUserTable = async () => {
   // Schema is now initialized in backend/config/db.js from schema.sql
 };

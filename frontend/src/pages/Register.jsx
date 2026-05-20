@@ -14,6 +14,12 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (password.length <= 8) {
+      setError('Password must contain more than 8 characters.');
+      return;
+    }
+
     try {
       await register({ name, email, password });
       navigate('/');

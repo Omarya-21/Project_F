@@ -94,13 +94,42 @@ export const updateOrderStatus = async (orderID, status) => {
   
   // Sync shipping if present
   try {
-    const shipmentStatus = status === 'shipped' ? 'Shipped' : (status === 'delivered' ? 'Delivered' : 'Processing');
+    const shipmentStatus = status === 'shipped' ? 'Shipped' : (status === 'delivered' ? 'Delivered' : (status === 'cancelled' ? 'Cancelled' : 'Processing'));
     await db.query(
       'UPDATE Shipment SET shipment_status = ? WHERE orderID = ?',
       [shipmentStatus, orderID]
     );
   } catch (err) {
     console.error('Warning updating Shipment status:', err.message);
+  }
+};
+
+export const cancelUserOrder = async (orderID, userID) => {
+  // Check if order exists and belongs to user
+  const [orders] = await db.query('SELECT * FROM Orders WHERE orderID = ? AND userID = ?', [orderID, userID]);
+  if (orders.length === 0) {
+    throw new Error('Order not found or unauthorized');
+  }
+
+  const order = orders[0];
+  if (order.status !== 'pending') {
+    throw new Error('Only pending orders can be cancelled');
+  }
+
+  // Update status to 'cancelled'
+  await db.query("UPDATE Orders SET status = 'cancelled' WHERE orderID = ?", [orderID]);
+
+  // Sync shipping as well
+  try {
+    await db.query("UPDATE Shipment SET shipment_status = 'Cancelled' WHERE orderID = ?", [orderID]);
+  } catch (err) {
+    console.error('Warning syncing Shipment cancellation:', err.message);
+  }
+
+  // Restore stock!
+  const [items] = await db.query('SELECT * FROM Order_Item WHERE orderID = ?', [orderID]);
+  for (const item of items) {
+    await db.query('UPDATE Products SET stock = stock + ? WHERE productID = ?', [item.quantity, item.productID]);
   }
 };
 

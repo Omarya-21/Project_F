@@ -20,6 +20,11 @@ export const updateOrderStatus = async (orderID, status) => {
   return response.data;
 };
 
+export const cancelOrder = async (orderID) => {
+  const response = await api.put(`/orders/${orderID}/cancel`);
+  return response.data;
+};
+
 export const getStats = async () => {
   const response = await api.get('/orders/stats');
   return response.data;

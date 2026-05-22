@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { getProducts, addProduct } from '../services/productService';
-import { Plus, Package, LayoutGrid, CheckCircle2, Image as ImageIcon, Sliders, DollarSign, Layers } from 'lucide-react';
+import { getProducts, addProduct, updateProduct } from '../services/productService';
+import { Plus, Package, LayoutGrid, CheckCircle2, Image as ImageIcon, Sliders, DollarSign, Layers, Edit } from 'lucide-react';
 
 const KNOWN_CATEGORIES = [
   'CPU',
@@ -39,6 +39,9 @@ export default function ProductsAdmin() {
   const [loading, setLoading] = useState(true);
   const [formCategory, setFormCategory] = useState('CPU');
   const [customCategory, setCustomCategory] = useState('');
+  
+  // Edit mode state
+  const [editingProduct, setEditingProduct] = useState(null);
   
   // High fidelity state fields
   const [name, setName] = useState('');
@@ -109,6 +112,50 @@ export default function ProductsAdmin() {
     });
   };
 
+  const handleStartEdit = (p) => {
+    setEditingProduct(p);
+    setName(p.name || '');
+    setBrand(p.brand || '');
+    setPrice(String(p.price) || '0');
+    setStock(String(p.stock) || '0');
+    setImageUrl(p.image || '');
+    setDescription(p.description || '');
+    
+    let parsedSpecs = {};
+    if (p.specs) {
+      try {
+        parsedSpecs = typeof p.specs === 'string' ? JSON.parse(p.specs) : p.specs;
+      } catch (err) {
+        console.error("Error parsing specs in edit mode:", err);
+      }
+    }
+    setSpecsList(parsedSpecs);
+
+    const cat = p.category;
+    if (KNOWN_CATEGORIES.includes(cat)) {
+      setFormCategory(cat);
+      setCustomCategory('');
+    } else {
+      setFormCategory('custom');
+      setCustomCategory(cat || '');
+    }
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingProduct(null);
+    setName('');
+    setBrand('');
+    setPrice('');
+    setStock('');
+    setImageUrl('');
+    setDescription('');
+    setSpecsList({});
+    setFormCategory('CPU');
+    setCustomCategory('');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -134,8 +181,14 @@ export default function ProductsAdmin() {
     };
 
     try {
-      await addProduct(productPayload);
-      setNotif('✅ Product added successfully!');
+      if (editingProduct) {
+        await updateProduct(editingProduct.id, productPayload);
+        setNotif('✅ Product updated successfully!');
+        setEditingProduct(null);
+      } else {
+        await addProduct(productPayload);
+        setNotif('✅ Product added successfully!');
+      }
       
       // Reset form fields
       setName('');
@@ -145,14 +198,16 @@ export default function ProductsAdmin() {
       setImageUrl('');
       setDescription('');
       setSpecsList({});
+      setFormCategory('CPU');
+      setCustomCategory('');
       
       // Auto reload
       fetchProducts();
       
       setTimeout(() => setNotif(''), 4000);
     } catch (err) {
-      console.error("Add error:", err);
-      setNotif('❌ Failed to add product.');
+      console.error("Save error:", err);
+      setNotif(editingProduct ? '❌ Failed to update product.' : '❌ Failed to add product.');
     }
   };
 
@@ -178,9 +233,19 @@ export default function ProductsAdmin() {
         <div className="lg:col-span-1 bg-gray-900 border border-gray-800 p-8 rounded-3xl h-fit space-y-6 shadow-xl">
           <div>
             <h2 className="text-xl font-black uppercase tracking-wide flex items-center gap-2 text-white italic">
-              <Plus size={20} className="text-blue-500 animate-pulse" /> Add Premium Unit
+              {editingProduct ? (
+                <>
+                  <Edit size={20} className="text-yellow-500 animate-pulse" /> Edit Premium Unit
+                </>
+              ) : (
+                <>
+                  <Plus size={20} className="text-blue-500 animate-pulse" /> Add Premium Unit
+                </>
+              )}
             </h2>
-            <p className="text-gray-550 text-xs mt-1">Configure specification metrics and asset path</p>
+            <p className="text-gray-500 text-xs mt-1">
+              {editingProduct ? `Modifying Unit #${editingProduct.id}` : 'Configure specification metrics and asset path'}
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -341,9 +406,16 @@ export default function ProductsAdmin() {
               )}
             </div>
 
-            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-xl transition-all uppercase tracking-widest text-xs italic shadow-lg shadow-blue-500/10 cursor-pointer">
-              Deploy Component
-            </button>
+            <div className="space-y-2">
+              <button type="submit" className={`w-full text-white font-black py-4 rounded-xl transition-all uppercase tracking-widest text-xs italic shadow-lg cursor-pointer ${editingProduct ? 'bg-yellow-600 hover:bg-yellow-500 shadow-yellow-500/10' : 'bg-blue-600 hover:bg-blue-500 shadow-blue-500/10'}`}>
+                {editingProduct ? 'Save Component Details' : 'Deploy Component'}
+              </button>
+              {editingProduct && (
+                <button type="button" onClick={handleCancelEdit} className="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold py-3 rounded-xl text-xs uppercase tracking-widest transition-colors cursor-pointer">
+                  Cancel Modification
+                </button>
+              )}
+            </div>
           </form>
         </div>
 
@@ -367,6 +439,7 @@ export default function ProductsAdmin() {
                     <th className="pb-4">Category</th>
                     <th className="pb-4">Price</th>
                     <th className="pb-4">Stock</th>
+                    <th className="pb-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-800/40">
@@ -390,11 +463,19 @@ export default function ProductsAdmin() {
                       <td className="py-4 text-sm">
                         <span className={`font-bold transition-colors ${p.stock <= 2 ? 'text-red-500 font-extrabold' : 'text-gray-300'}`}>{p.stock}</span>
                       </td>
+                      <td className="py-4 text-sm text-right">
+                        <button
+                          onClick={() => handleStartEdit(p)}
+                          className="px-3 py-1.5 bg-gray-800 hover:bg-yellow-600 text-gray-300 hover:text-black rounded-lg text-xs font-bold font-mono transition-all flex items-center gap-1.5 ml-auto cursor-pointer"
+                        >
+                          <Edit size={12} /> Edit
+                        </button>
+                      </td>
                     </tr>
                   ))}
                   {products.length === 0 && (
                     <tr>
-                      <td colSpan="4" className="text-center py-12 text-gray-500 italic">No inventory detected in local servers.</td>
+                      <td colSpan="5" className="text-center py-12 text-gray-500 italic">No inventory detected in local servers.</td>
                     </tr>
                   )}
                 </tbody>

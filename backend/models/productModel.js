@@ -90,6 +90,40 @@ export const createProduct = async ({ name, brand, price, stock, category, image
   return productId;
 };
 
+export const updateProduct = async (id, { name, brand, price, stock, category, image, description, specs = {} }) => {
+  // Ensure Brand exists
+  let [brandRows] = await db.query('SELECT brandID FROM Brands WHERE brand_name = ?', [brand]);
+  let brandID;
+  if (brandRows.length === 0) {
+    const [res] = await db.query('INSERT INTO Brands (brand_name) VALUES (?)', [brand]);
+    brandID = res.insertId;
+  } else {
+    brandID = brandRows[0].brandID;
+  }
+
+  // Ensure Category exists
+  let [catRows] = await db.query('SELECT categoryID FROM Category WHERE category_name = ?', [category]);
+  let categoryID;
+  if (catRows.length === 0) {
+    const [res] = await db.query('INSERT INTO Category (category_name) VALUES (?)', [category]);
+    categoryID = res.insertId;
+  } else {
+    categoryID = catRows[0].categoryID;
+  }
+
+  // Update Products table
+  await db.query(
+    'UPDATE Products SET name = ?, price = ?, stock = ?, description = ?, image_url = ?, brandID = ?, categoryID = ? WHERE productID = ?',
+    [name, price, stock, description, image, brandID, categoryID, id]
+  );
+
+  // Clear existing specs and insert new ones
+  await db.query('DELETE FROM ProductSpecs WHERE productID = ?', [id]);
+  for (const [key, value] of Object.entries(specs)) {
+    await db.query('INSERT INTO ProductSpecs (productID, spec_key, value) VALUES (?, ?, ?)', [id, key, String(value)]);
+  }
+};
+
 export const initDb = async () => {
   // Seed data if table is empty
   const [rows] = await db.query('SELECT COUNT(*) as count FROM Products');

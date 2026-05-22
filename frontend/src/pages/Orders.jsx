@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getMyOrders } from '../services/orderService';
+import { getMyOrders, cancelOrder } from '../services/orderService';
 import { useAuth } from '../context/AuthContext';
 import { Package, Clock, Truck, CreditCard, RefreshCw } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -22,6 +22,22 @@ export default function Orders() {
       setError('Failed to fetch your order history.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCancelOrder = async (orderID) => {
+    if (!window.confirm('Are you sure you want to cancel this order? This action will restore product quantities to stock and is irreversible.')) {
+      return;
+    }
+    try {
+      setError('');
+      await cancelOrder(orderID);
+      // reload
+      const data = await getMyOrders();
+      setOrders(data);
+    } catch (err) {
+      console.error("Order cancellation failed:", err);
+      setError(err.response?.data?.message || 'Failed to cancel the order. Please try again.');
     }
   };
 
@@ -135,9 +151,19 @@ export default function Orders() {
                     <span>Placed on {new Date(order.order_date).toLocaleString()}</span>
                   </div>
                 </div>
-                <div className="text-right">
-                  <span className="text-xs text-gray-500 block uppercase tracking-wider font-bold">Total Paid</span>
-                  <span className="text-2xl font-black text-blue-500 font-mono">${parseFloat(order.total_price).toFixed(2)}</span>
+                <div className="flex flex-col items-end gap-2 text-right">
+                  <div>
+                    <span className="text-xs text-gray-500 block uppercase tracking-wider font-bold">Total Paid</span>
+                    <span className="text-2xl font-black text-blue-500 font-mono">${parseFloat(order.total_price).toFixed(2)}</span>
+                  </div>
+                  {order.status?.toLowerCase() === 'pending' && (
+                    <button
+                      onClick={() => handleCancelOrder(order.orderID)}
+                      className="px-3 py-1.5 bg-red-600/15 hover:bg-red-600 text-red-500 hover:text-white border border-red-500/30 rounded-lg text-xs font-black uppercase tracking-wider transition-all cursor-pointer"
+                    >
+                      Cancel Order
+                    </button>
+                  )}
                 </div>
               </div>
 

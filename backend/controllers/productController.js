@@ -29,3 +29,14 @@ export const addProduct = async (req, res) => {
     res.status(500).json({ error: 'Could not add product' });
   }
 };
+
+export const updateProduct = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await ProductModel.updateProduct(id, req.body);
+    res.json({ message: 'Product updated successfully' });
+  } catch (error) {
+    console.error('❌ Error updating product:', error);
+    res.status(500).json({ error: 'Failed to update product' });
+  }
+};

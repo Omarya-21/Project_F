@@ -68,6 +68,20 @@ export const updateOrderStatus = async (req, res) => {
   }
 };
 
+export const cancelOrder = async (req, res) => {
+  const { orderID } = req.params;
+  const userID = req.user.id;
+
+  try {
+    await OrderModel.cancelUserOrder(orderID, userID);
+    console.log(`✅ User ID ${userID} successfully cancelled Order ID ${orderID}`);
+    res.json({ message: 'Order has been successfully cancelled.' });
+  } catch (error) {
+    console.error('❌ Direct order cancellation error:', error);
+    res.status(400).json({ message: error.message || 'Failed to cancel the order.' });
+  }
+};
+
 export const getStats = async (req, res) => {
   try {
     const stats = await OrderModel.getDatabaseStats();

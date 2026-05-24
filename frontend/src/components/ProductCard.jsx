@@ -1,11 +1,22 @@
 import { motion } from 'framer-motion';
 import { ShoppingCart, Package, Eye } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { formatPrice } from '../utils/formatPrice';
 
 export default function ProductCard({ product }) {
   const { addToCart } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleAddToCart = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    addToCart(product);
+  };
 
   return (
     <motion.div 
@@ -40,7 +51,7 @@ export default function ProductCard({ product }) {
       <div className="mt-6 flex items-center justify-between">
         <span className="text-2xl font-black text-white">{formatPrice(product.price)}</span>
         <button 
-          onClick={() => addToCart(product)}
+          onClick={handleAddToCart}
           className="bg-white text-black p-3 rounded-xl hover:bg-blue-600 hover:text-white transition-all transform hover:scale-110 active:scale-90"
         >
           <ShoppingCart size={18} />

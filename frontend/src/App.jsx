@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import AIAssistant from './components/AIAssistant';
-import CookieBanner from './components/CookieBanner';
 import Home from './pages/Home';
 import Products from './pages/Products';
 import CategoryProducts from './pages/CategoryProducts';
@@ -117,7 +116,6 @@ export default function App() {
             </main>
             <Footer />
             <AIAssistant />
-            <CookieBanner />
           </div>
         </Router>
       </CartProvider>

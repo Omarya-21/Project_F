@@ -1,4 +1,5 @@
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trash2, Plus, Minus, ArrowRight, ShoppingBag, Package } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -7,6 +8,7 @@ import '../styles/Cart.css';
 
 export default function Cart() {
   const { cart, removeFromCart, updateQuantity, subtotal } = useCart();
+  const { user } = useAuth();
 
   if (cart.length === 0) {
     return (
@@ -99,8 +101,8 @@ export default function Cart() {
               <span className="text-lg font-black uppercase tracking-[0.2em] italic">Total</span>
               <span className="text-3xl font-black text-blue-500">{formatPrice(subtotal)}</span>
             </div>
-            <Link to="/checkout" className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 transition-all transform hover:scale-[1.02] active:scale-95 uppercase tracking-widest">
-              Proceed to Checkout <ArrowRight size={22} />
+            <Link to={user ? "/checkout" : "/login"} className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 transition-all transform hover:scale-[1.02] active:scale-95 uppercase tracking-widest">
+              {user ? "Proceed to Checkout" : "Login to Checkout"} <ArrowRight size={22} />
             </Link>
           </div>
         </div>

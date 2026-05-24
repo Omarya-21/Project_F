@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { ShoppingCart, ArrowLeft, Shield, Truck, Zap, Package } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { formatPrice } from '../utils/formatPrice';
 import Loader from '../components/Loader';
 import ReviewSection from '../components/ReviewSection';
@@ -14,6 +15,16 @@ export default function ProductDetails() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleAddToCart = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    addToCart(product);
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -88,7 +99,7 @@ export default function ProductDetails() {
           </div>
 
           <button 
-            onClick={() => addToCart(product)}
+            onClick={handleAddToCart}
             disabled={product.stock === 0}
             className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-gray-800 disabled:text-gray-600 text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 transition-all transform hover:scale-[1.02] active:scale-95 uppercase tracking-widest"
           >

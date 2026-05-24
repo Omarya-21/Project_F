@@ -17,7 +17,7 @@ export default function Contact() {
               </div>
               <div>
                 <h4 className="text-white font-bold mb-1">Email Us</h4>
-                <p className="text-gray-400 text-sm">support@omarspc.com</p>
+                <p className="text-gray-400 text-sm">omaryammine130@gmail.com</p>
               </div>
             </div>
 
@@ -27,7 +27,7 @@ export default function Contact() {
               </div>
               <div>
                 <h4 className="text-white font-bold mb-1">Call Us</h4>
-                <p className="text-gray-400 text-sm">+1 (555) 012-3456</p>
+                <p className="text-gray-400 text-sm">+961 76 803 317</p>
               </div>
             </div>
 

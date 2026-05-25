@@ -12,7 +12,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 // Force 5000 in dev, 3000 in production
-const PORT = process.env.NODE_ENV === 'production' ? 3000 : 5000;
+const PORT = process.env.PORT || (process.env.NODE_ENV === 'production' ? 3000 : 5000);
 
 // Middleware
 app.use(cors());

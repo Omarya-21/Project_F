@@ -12,7 +12,8 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 // Force 5000 in dev, use system PORT (or 3000) in production
-const PORT = process.env.NODE_ENV === 'production' ? (process.env.PORT || 3000) : 5000;
+const isDev = process.env.NODE_ENV === 'development' || process.env.npm_lifecycle_event === 'dev';
+const PORT = isDev ? 5000 : (process.env.PORT || 3000);
 
 // Middleware
 app.use(cors());

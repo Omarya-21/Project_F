@@ -10,6 +10,25 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const getSchemaPath = () => {
+  const paths = [
+    path.resolve(__dirname, '../schema.sql'),
+    path.resolve(__dirname, '../../backend/schema.sql'),
+    path.resolve(process.cwd(), 'backend/schema.sql'),
+    path.resolve(process.cwd(), 'schema.sql'),
+    path.resolve(__dirname, 'schema.sql'),
+    path.resolve(__dirname, 'backend/schema.sql'),
+    '/app/backend/schema.sql',
+    '/app/schema.sql'
+  ];
+  for (const p of paths) {
+    if (fs.existsSync(p)) {
+      return p;
+    }
+  }
+  return null;
+};
+
 let pool;
 let isSQLite = false;
 
@@ -66,19 +85,9 @@ const connectMySQL = async () => {
       await mysqlPool.query('SELECT 1');
       console.log('✅ Connected to MySQL database successfully!');
 
-      // Locate the schema.sql file robustly
-      let schemaPath = path.resolve(__dirname, '../schema.sql');
-      if (!fs.existsSync(schemaPath)) {
-        schemaPath = path.resolve(__dirname, '../../backend/schema.sql');
-      }
-      if (!fs.existsSync(schemaPath)) {
-        schemaPath = path.resolve(process.cwd(), 'backend/schema.sql');
-      }
-      if (!fs.existsSync(schemaPath)) {
-        schemaPath = path.resolve(process.cwd(), 'schema.sql');
-      }
+      const schemaPath = getSchemaPath();
 
-      if (fs.existsSync(schemaPath)) {
+      if (schemaPath) {
         console.log(`📜 Found schema.sql at: ${schemaPath}. Initializing MySQL tables...`);
         const schema = fs.readFileSync(schemaPath, 'utf8');
         
@@ -141,9 +150,9 @@ if (!pool) {
   // Helper to init from schema.sql
   const initFromFile = () => {
     try {
-      const schemaPath = path.resolve(__dirname, '../../backend/schema.sql');
-      console.log(`🔍 Checking for schema at: ${schemaPath}`);
-      if (fs.existsSync(schemaPath)) {
+      const schemaPath = getSchemaPath();
+      console.log(`🔍 Checking for schema at: ${schemaPath || 'None'}`);
+      if (schemaPath) {
         let schema = fs.readFileSync(schemaPath, 'utf8');
         console.log(`📜 Read schema file (${schema.length} bytes)`);
         

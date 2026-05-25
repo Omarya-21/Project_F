@@ -14,7 +14,7 @@ export default defineConfig({
     tailwindcss(),
   ],
   build: {
-    outDir: '../dist',
+    outDir: process.env.NETLIFY ? 'dist' : '../dist',
     emptyOutDir: true,
   },
   resolve: {

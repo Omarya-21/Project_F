@@ -20,32 +20,75 @@ const connectMySQL = async () => {
   const password = process.env.DB_PASSWORD || process.env.MYSQLPASSWORD || '';
   const database = process.env.DB_NAME || process.env.MYSQLDATABASE;
   const port = parseInt(process.env.DB_PORT || process.env.MYSQLPORT || '3306', 10);
+  const connectionString = process.env.DATABASE_URL || process.env.MYSQL_URL || process.env.MYSQL_PRIVATE_URL;
 
-  if (host) {
+  if (host || connectionString) {
     try {
-      console.log(`🔌 Attempting to connect to MySQL at ${host}:${port}...`);
-      const mysqlPool = mysql.createPool({
-        host,
-        user,
-        password,
-        database,
-        port,
+      let connectionConfig = {
         waitForConnections: true,
         connectionLimit: 10,
         queueLimit: 0,
-        connectTimeout: 5000 // 5s timeout
-      });
+        connectTimeout: 10000 // 10s connection timeout
+      };
+
+      if (connectionString && (connectionString.startsWith('mysql:') || connectionString.startsWith('mysql2:'))) {
+        console.log(`🔌 Attempting to connect to MySQL using connection URI...`);
+        connectionConfig.uri = connectionString;
+      } else {
+        console.log(`🔌 Attempting to connect to MySQL...`);
+        console.log(`📡 Host: ${host || 'not specified'}`);
+        console.log(`📡 User: ${user || 'not specified'}`);
+        console.log(`📡 Database: ${database || 'not specified'}`);
+        console.log(`📡 Port: ${port}`);
+        
+        connectionConfig.host = host;
+        connectionConfig.user = user;
+        connectionConfig.password = password;
+        connectionConfig.database = database;
+        connectionConfig.port = port;
+      }
+
+      // Automatically enable SSL for cloud-hosted environments (non-localhost)
+      const isLocal = 
+        (host === 'localhost' || host === '127.0.0.1') || 
+        (connectionString && (connectionString.includes('localhost') || connectionString.includes('127.0.0.1')));
+      
+      if (!isLocal) {
+        console.log('🔒 Enabling SSL for secure cloud database connection');
+        connectionConfig.ssl = {
+          rejectUnauthorized: false
+        };
+      }
+
+      const mysqlPool = mysql.createPool(connectionConfig);
 
       // Test the connection
       await mysqlPool.query('SELECT 1');
-      console.log('✅ Connected to MySQL database');
+      console.log('✅ Connected to MySQL database successfully!');
 
-      // Initialize MySQL schema if needed
-      const schemaPath = path.resolve(__dirname, '../../backend/schema.sql');
+      // Locate the schema.sql file robustly
+      let schemaPath = path.resolve(__dirname, '../schema.sql');
+      if (!fs.existsSync(schemaPath)) {
+        schemaPath = path.resolve(__dirname, '../../backend/schema.sql');
+      }
+      if (!fs.existsSync(schemaPath)) {
+        schemaPath = path.resolve(process.cwd(), 'backend/schema.sql');
+      }
+      if (!fs.existsSync(schemaPath)) {
+        schemaPath = path.resolve(process.cwd(), 'schema.sql');
+      }
+
       if (fs.existsSync(schemaPath)) {
+        console.log(`📜 Found schema.sql at: ${schemaPath}. Initializing MySQL tables...`);
         const schema = fs.readFileSync(schemaPath, 'utf8');
-        // Simple split and execute for MySQL
-        const statements = schema
+        
+        // Clean SQL comment lines first to ensure clean statement execution
+        const cleanSchema = schema
+          .split('\n')
+          .filter(line => !line.trim().startsWith('--'))
+          .join('\n');
+
+        const statements = cleanSchema
           .split(';')
           .map(s => s.trim())
           .filter(s => s.length > 0);
@@ -54,13 +97,19 @@ const connectMySQL = async () => {
           try {
             await mysqlPool.query(statement);
           } catch (stmtErr) {
-            // Ignore "already exists" errors
-            if (!stmtErr.message.includes('already exists') && !stmtErr.message.includes('Table \'.*\' already exists')) {
-              console.warn('⚠️ SQL Statement Warning:', stmtErr.message);
+            const isAlreadyExists = 
+              stmtErr.message.toLowerCase().includes('already exists') || 
+              stmtErr.code === 'ER_TABLE_EXISTS_ERROR' ||
+              stmtErr.code === 'ER_DUP_KEYNAME';
+              
+            if (!isAlreadyExists) {
+              console.warn(`⚠️ SQL Statement Warning [Code: ${stmtErr.code || 'none'}]:`, stmtErr.message);
             }
           }
         }
-        console.log('✅ MySQL schema checked/initialized');
+        console.log('✅ MySQL schema check completes successfully');
+      } else {
+        console.error('⚠️ Could not find schema.sql to initialize MySQL tables!');
       }
 
       return mysqlPool;
@@ -68,6 +117,8 @@ const connectMySQL = async () => {
       console.error('❌ MySQL connection failed:', err.message);
       console.log('📦 Falling back to SQLite...');
     }
+  } else {
+    console.log('ℹ️ No MySQL environment variables detected. Falling back to SQLite...');
   }
   return null;
 };

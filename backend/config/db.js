@@ -15,14 +15,21 @@ let isSQLite = false;
 
 // Attempt to connect to MySQL
 const connectMySQL = async () => {
-  if (process.env.DB_HOST) {
+  const host = process.env.DB_HOST || process.env.MYSQLHOST;
+  const user = process.env.DB_USER || process.env.MYSQLUSER;
+  const password = process.env.DB_PASSWORD || process.env.MYSQLPASSWORD || '';
+  const database = process.env.DB_NAME || process.env.MYSQLDATABASE;
+  const port = parseInt(process.env.DB_PORT || process.env.MYSQLPORT || '3306', 10);
+
+  if (host) {
     try {
-      console.log(`🔌 Attempting to connect to MySQL at ${process.env.DB_HOST}...`);
+      console.log(`🔌 Attempting to connect to MySQL at ${host}:${port}...`);
       const mysqlPool = mysql.createPool({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
+        host,
+        user,
+        password,
+        database,
+        port,
         waitForConnections: true,
         connectionLimit: 10,
         queueLimit: 0,

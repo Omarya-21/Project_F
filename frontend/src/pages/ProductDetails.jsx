@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 import { motion } from 'framer-motion';
 import { ShoppingCart, ArrowLeft, Shield, Truck, Zap, Package } from 'lucide-react';
 import { useCart } from '../context/CartContext';
@@ -29,7 +29,7 @@ export default function ProductDetails() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await axios.get(`/api/products/${id}`);
+        const res = await api.get(`/products/${id}`);
         setProduct(res.data);
       } catch (err) {
         console.error(err);

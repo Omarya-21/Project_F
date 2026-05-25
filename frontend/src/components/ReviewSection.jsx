@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import { Link } from 'react-router-dom';
 import { Star, MessageSquare, Send } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -16,7 +16,7 @@ export default function ReviewSection({ productID }) {
 
   const fetchReviews = useCallback(async () => {
     try {
-      const res = await axios.get(`/api/reviews/${productID}`);
+      const res = await api.get(`/reviews/${productID}`);
       setReviews(res.data.reviews || []);
       setAverage(res.data.average || 0);
     } catch (err) {
@@ -43,12 +43,10 @@ export default function ReviewSection({ productID }) {
     
     setSubmitting(true);
     try {
-      await axios.post('/api/reviews', {
+      await api.post('/reviews', {
         productID,
         rating,
         comment
-      }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       setComment('');
       setRating(5);

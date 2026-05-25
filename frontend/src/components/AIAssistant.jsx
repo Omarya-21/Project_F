@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { getBuildAdvice } from '../services/geminiService';
-import axios from 'axios';
+import api from '../services/api';
 
 export default function AIAssistant() {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,7 +28,7 @@ export default function AIAssistant() {
     // Fetch products to give context to the AI
     const fetchProducts = async () => {
       try {
-        const res = await axios.get('/api/products');
+        const res = await api.get('/products');
         // Parse specs from JSON strings
         const parsedProducts = res.data.map(p => ({
           ...p,

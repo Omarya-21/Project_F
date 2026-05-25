@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Shield, UserPlus, Users, Search, RefreshCw, Check, AtSign, KeyRound, User } from 'lucide-react';
 import { getUsers, updateUserRole } from '../services/authService';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import api from '../services/api';
 
 export default function UsersAdmin() {
   const { user: currentUser } = useAuth();
@@ -84,8 +84,8 @@ export default function UsersAdmin() {
         role: newAdmin.role
       };
       
-      // We will perform a direct axios request so we don't clobber the logged in token in useAuth
-      await axios.post('/api/auth/register', payload);
+      // We will perform a direct api request so we don't clobber the logged in token in useAuth
+      await api.post('/auth/register', payload);
 
       setSuccess(`Successfully added new ${newAdmin.role}: ${newAdmin.name}!`);
       setNewAdmin({ name: '', email: '', password: '', role: 'admin' });

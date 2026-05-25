@@ -1,5 +1,6 @@
 import mysql from 'mysql2/promise';
 import SQLite from 'better-sqlite3';
+import pg from 'pg';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -132,7 +133,136 @@ const connectMySQL = async () => {
   return null;
 };
 
-pool = await connectMySQL();
+// Run connectPostgres first, fallback to MySQL, and then fallback to SQLite
+const connectPostgres = async () => {
+  const connectionString = process.env.DATABASE_URL || process.env.MYSQL_URL || process.env.MYSQL_PRIVATE_URL;
+  const isPostgresURL = connectionString && (connectionString.startsWith('postgres:') || connectionString.startsWith('postgresql:'));
+  const hasPGVars = process.env.PGHOST || process.env.PGDATABASE;
+
+  if (isPostgresURL || hasPGVars) {
+    try {
+      console.log('🔌 Attempting to connect to PostgreSQL (Railway)...');
+      let pgPool;
+      if (isPostgresURL) {
+        pgPool = new pg.Pool({
+          connectionString: connectionString,
+          ssl: connectionString.includes('localhost') || connectionString.includes('127.0.0.1') ? false : { rejectUnauthorized: false }
+        });
+      } else {
+        pgPool = new pg.Pool({
+          host: process.env.PGHOST,
+          port: parseInt(process.env.PGPORT || '5432', 10),
+          user: process.env.PGUSER,
+          password: process.env.PGPASSWORD,
+          database: process.env.PGDATABASE,
+          ssl: (process.env.PGHOST === 'localhost' || process.env.PGHOST === '127.0.0.1') ? false : { rejectUnauthorized: false }
+        });
+      }
+
+      await pgPool.query('SELECT 1');
+      console.log('✅ Connected to PostgreSQL database successfully!');
+
+      const schemaPath = getSchemaPath();
+      if (schemaPath) {
+        console.log(`📜 Found schema.sql at: ${schemaPath}. Initializing PostgreSQL tables...`);
+        const schema = fs.readFileSync(schemaPath, 'utf8');
+
+        // Transform schema dynamically to be compatible with PostgreSQL
+        const pgSchema = schema
+          .replace(/INT PRIMARY KEY AUTO_INCREMENT/gi, 'SERIAL PRIMARY KEY')
+          .replace(/DECIMAL\(10,2\)/gi, 'DECIMAL')
+          .replace(/DATETIME DEFAULT CURRENT_TIMESTAMP/gi, 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP')
+          .replace(/DATETIME/gi, 'TIMESTAMP')
+          .replace(/AUTO_INCREMENT/gi, '');
+
+        const statements = pgSchema
+          .split(';')
+          .map(s => s.trim())
+          .filter(s => s.length > 0);
+
+        for (const statement of statements) {
+          try {
+            await pgPool.query(statement);
+          } catch (stmtErr) {
+            const isAlreadyExists = stmtErr.message.toLowerCase().includes('already exists');
+            if (!isAlreadyExists) {
+              console.warn(`⚠️ PostgreSQL Schema Statement Warning:`, stmtErr.message);
+            }
+          }
+        }
+        console.log('✅ PostgreSQL schema check completes successfully');
+      } else {
+        console.error('⚠️ Could not find schema.sql to initialize PostgreSQL tables!');
+      }
+
+      return {
+        query: async (sql, params = []) => {
+          try {
+            // Convert '?' placeholders to '$1', '$2', etc.
+            let paramIndex = 1;
+            let pgSql = sql.replace(/\?/g, () => `$${paramIndex++}`);
+
+            // For INSERT statements, append ' RETURNING *' if not already present
+            const isInsert = pgSql.trim().toUpperCase().startsWith('INSERT');
+            if (isInsert && !pgSql.toUpperCase().includes('RETURNING')) {
+              pgSql = pgSql + ' RETURNING *';
+            }
+
+            const queryParams = Array.isArray(params) ? params : [params];
+
+            const result = await pgPool.query(pgSql, queryParams);
+
+            if (isInsert) {
+              const insertedRow = result.rows[0];
+              const insertIdKey = insertedRow ? Object.keys(insertedRow).find(key => key.toLowerCase().endsWith('id')) : null;
+              const insertId = insertIdKey ? insertedRow[insertIdKey] : null;
+              return [{ insertId: insertId, affectedRows: result.rowCount }];
+            } else {
+              // Map lowercase properties (e.g., 'userid') to exact case (e.g., 'userID')
+              const mappedRows = result.rows.map(row => {
+                if (!row) return row;
+                const newRow = { ...row };
+                const keys = Object.keys(row);
+                for (const key of keys) {
+                  const lowerKey = key.toLowerCase();
+                  if (lowerKey === 'userid' && key !== 'userID') newRow.userID = row[key];
+                  if (lowerKey === 'brandid' && key !== 'brandID') newRow.brandID = row[key];
+                  if (lowerKey === 'categoryid' && key !== 'categoryID') newRow.categoryID = row[key];
+                  if (lowerKey === 'productid' && key !== 'productID') newRow.productID = row[key];
+                  if (lowerKey === 'specid' && key !== 'specID') newRow.specID = row[key];
+                  if (lowerKey === 'compatibilityid' && key !== 'compatibilityID') newRow.compatibilityID = row[key];
+                  if (lowerKey === 'cartid' && key !== 'cartID') newRow.cartID = row[key];
+                  if (lowerKey === 'cartitemid' && key !== 'cartItemID') newRow.cartItemID = row[key];
+                  if (lowerKey === 'orderid' && key !== 'orderID') newRow.orderID = row[key];
+                  if (lowerKey === 'orderitemid' && key !== 'orderItemID') newRow.orderItemID = row[key];
+                  if (lowerKey === 'reviewid' && key !== 'reviewID') newRow.reviewID = row[key];
+                  if (lowerKey === 'paymentid' && key !== 'paymentID') newRow.paymentID = row[key];
+                  if (lowerKey === 'shipmentid' && key !== 'shipmentID') newRow.shipmentID = row[key];
+                }
+                return newRow;
+              });
+              return [mappedRows];
+            }
+          } catch (err) {
+            console.error('❌ PostgreSQL Query Error:', err.message);
+            console.error('SQL:', sql);
+            throw err;
+          }
+        }
+      };
+    } catch (err) {
+      console.error('❌ PostgreSQL connection failed:', err.message);
+      console.log('📦 Falling back to other databases...');
+    }
+  }
+  return null;
+};
+
+pool = await connectPostgres();
+
+if (!pool) {
+  pool = await connectMySQL();
+}
 
 if (!pool) {
   console.log('📦 Using SQLite fallback for data persistence');

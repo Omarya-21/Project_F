@@ -57,6 +57,15 @@ export const getAdvice = async (req, res) => {
     res.json({ text });
   } catch (error) {
     console.error("❌ AI Error:", error);
+    
+    const errString = typeof error === 'object' ? JSON.stringify(error) : String(error);
+    if (errString.includes("leaked") || errString.includes("PERMISSION_DENIED") || errString.includes("403")) {
+      return res.status(403).json({ 
+        error: "Leaked API Key",
+        text: "⚠️ **Gemini API Error (Leaked Key)**\n\nThe Gemini API key configured in this environment is reported as leaked or compromised by Google's security systems.\n\n**How to Fix This:**\n1. Go to [Google AI Studio](https://aistudio.google.com/) and create or retrieve a new API key.\n2. Open the **Settings > Secrets / Environment Variables** panel in Google AI Studio Build.\n3. Update the `GEMINI_API_KEY` with your new key.\n4. Restart the assistant or refresh your page to continue!"
+      });
+    }
+    
     res.status(500).json({ error: "I'm having trouble thinking right now. Please try again." });
   }
 };

@@ -13,6 +13,9 @@ export const getBuildAdvice = async (messages, products) => {
     return response.data.text;
   } catch (error) {
     console.error("Frontend AI Service Error:", error);
+    if (error.response?.data?.text) {
+      return error.response.data.text;
+    }
     throw error;
   }
 };

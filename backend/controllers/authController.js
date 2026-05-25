@@ -29,8 +29,12 @@ export const register = async (req, res) => {
       user: { id: userId, name, email, role } 
     });
   } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ message: 'Something went wrong during registration.' });
+    console.error('🔴 REGISTRATION ERROR DETECTED:', error);
+    res.status(500).json({ 
+      message: 'Something went wrong during registration.',
+      details: error.message,
+      code: error.code || 'UNKNOWN'
+    });
   }
 };
 
@@ -60,8 +64,12 @@ export const login = async (req, res) => {
       } 
     });
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ message: 'Something went wrong during login.' });
+    console.error('🔴 LOGIN ERROR DETECTED:', error);
+    res.status(500).json({ 
+      message: 'Something went wrong during login.',
+      details: error.message,
+      code: error.code || 'UNKNOWN'
+    });
   }
 };
 

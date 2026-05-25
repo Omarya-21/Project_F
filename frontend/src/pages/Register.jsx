@@ -24,7 +24,15 @@ export default function Register() {
       await register({ name, email, password });
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      console.error("Registration error:", err);
+      const serverErr = err.response?.data;
+      if (serverErr && serverErr.details) {
+        setError(`${serverErr.message} Details: ${serverErr.details}`);
+      } else if (err.message === 'Network Error' || !err.response) {
+        setError(`Unable to connect to the backend server. 💡 Troubleshooting: If you are running the frontend on Netlify (or local preview) and the backend on Railway: Make sure you have set "VITE_API_URL" to your Railway server's URL in your hosting environment variables, and then trigger a NEW deployment (rebuild) on Netlify to bake that variable into the built files.`);
+      } else {
+        setError(serverErr?.message || 'Registration failed. Please try again.');
+      }
     }
   };
 

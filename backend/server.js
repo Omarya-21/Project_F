@@ -12,8 +12,15 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 // Force 5000 in dev, use system PORT (or 3000) in production
-const isDev = process.env.NODE_ENV === 'development' || process.env.npm_lifecycle_event === 'dev';
+const isDev = process.env.NODE_ENV !== 'production';
 const PORT = isDev ? 5000 : (process.env.PORT || 3000);
+
+console.log('🔍 ENVIRONMENT DIAGNOSTICS:');
+console.log('process.env.NODE_ENV:', process.env.NODE_ENV);
+console.log('process.env.npm_lifecycle_event:', process.env.npm_lifecycle_event);
+console.log('process.env.PORT:', process.env.PORT);
+console.log('isDev judged as:', isDev);
+console.log('PORT selected as:', PORT);
 
 // Middleware
 app.use(cors());

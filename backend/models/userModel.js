@@ -21,7 +21,9 @@ export const getUserById = async (id) => {
 
 export const getUserCount = async () => {
   const [rows] = await db.query('SELECT COUNT(*) as count FROM Users');
-  return rows[0].count;
+  if (!rows || rows.length === 0) return 0;
+  const val = rows[0].count !== undefined ? rows[0].count : rows[0].COUNT;
+  return Number(val || 0);
 };
 
 export const getAllUsers = async () => {

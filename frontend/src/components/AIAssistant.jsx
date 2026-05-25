@@ -29,12 +29,18 @@ export default function AIAssistant() {
     const fetchProducts = async () => {
       try {
         const res = await api.get('/products');
-        // Parse specs from JSON strings
-        const parsedProducts = res.data.map(p => ({
-          ...p,
-          specs: typeof p.specs === 'string' ? JSON.parse(p.specs) : p.specs
-        }));
-        setProducts(parsedProducts);
+        // Parse specs from JSON strings safely only if res.data is an array
+        const data = res.data;
+        if (Array.isArray(data)) {
+          const parsedProducts = data.map(p => ({
+            ...p,
+            specs: typeof p.specs === 'string' ? JSON.parse(p.specs) : p.specs
+          }));
+          setProducts(parsedProducts);
+        } else {
+          console.warn("Expected array of products, but received:", data);
+          setProducts([]);
+        }
       } catch (err) {
         console.error("Failed to fetch products for AI index", err);
       }

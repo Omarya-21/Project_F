@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { getProducts, addProduct, updateProduct } from '../services/productService';
-import { Plus, Package, LayoutGrid, CheckCircle2, Image as ImageIcon, Sliders, DollarSign, Layers, Edit } from 'lucide-react';
+import { getProducts, addProduct, updateProduct, uploadProductImage } from '../services/productService';
+import { Plus, Package, LayoutGrid, CheckCircle2, Image as ImageIcon, Sliders, DollarSign, Layers, Edit, Upload } from 'lucide-react';
 
 const KNOWN_CATEGORIES = [
   'CPU',
@@ -57,6 +57,34 @@ export default function ProductsAdmin() {
   const [specsList, setSpecsList] = useState({});
 
   const [notif, setNotif] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setNotif('❌ Image size should be less than 5MB');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      setIsUploading(true);
+      setNotif('');
+      const response = await uploadProductImage(formData);
+      setImageUrl(response.imageUrl);
+      setNotif('✅ Image uploaded successfully!');
+      setTimeout(() => setNotif(''), 3000);
+    } catch (err) {
+      console.error('Image upload failed:', err);
+      setNotif('❌ Failed to upload image. Please try again.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -341,16 +369,83 @@ export default function ProductsAdmin() {
             )}
 
             <div>
-              <label className="block text-[10px] font-black uppercase tracking-wider text-gray-550 mb-1.5 flex items-center gap-1">
-                <ImageIcon size={11} className="text-blue-500" /> IMAGE URL (OPTIONAL)
+              <label className="block text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1.5 flex items-center gap-1">
+                <ImageIcon size={11} className="text-blue-500" /> PRODUCT IMAGE
               </label>
-              <input 
-                type="url" 
-                placeholder="Leave blank for smart defaults" 
-                className="w-full bg-black border border-gray-800/80 rounded-xl p-3 text-white text-xs focus:ring-1 focus:ring-blue-500 outline-none font-mono"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-              />
+              
+              <div className="space-y-3">
+                {/* Upload file area */}
+                <div className="relative border-2 border-dashed border-gray-800 rounded-xl p-4 bg-black/30 hover:bg-black/50 transition-colors flex flex-col items-center justify-center text-center group cursor-pointer">
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    id="product-image-upload"
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    onChange={handleImageUpload}
+                    disabled={isUploading}
+                  />
+                  <div className="space-y-1">
+                    {isUploading ? (
+                      <div className="flex flex-col items-center space-y-2">
+                        <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-xs text-gray-500 font-medium">Uploading component assets...</span>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="mx-auto w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center group-hover:bg-blue-600/10 transition-colors">
+                          <Upload size={16} className="text-gray-400 group-hover:text-blue-500 transition-colors" />
+                        </div>
+                        <p className="text-xs font-bold text-gray-300">Upload product picture</p>
+                        <p className="text-[10px] text-gray-500">Supports PNG, JPG, WEBP, GIF (Max 5MB)</p>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Option divider */}
+                <div className="flex items-center gap-2">
+                  <div className="h-[1px] bg-gray-850 flex-1"></div>
+                  <span className="text-[9px] text-gray-650 font-black uppercase tracking-widest">or</span>
+                  <div className="h-[1px] bg-gray-850 flex-1"></div>
+                </div>
+
+                {/* Direct URL entry */}
+                <div>
+                  <input 
+                    type="url" 
+                    placeholder="Paste image web URL manually" 
+                    className="w-full bg-black border border-gray-800/80 rounded-xl p-3 text-white text-xs focus:ring-1 focus:ring-blue-500 outline-none font-mono"
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                  />
+                </div>
+
+                {/* Thumbnail preview of the URL or uploaded photo */}
+                {imageUrl && (
+                  <div className="flex items-center gap-3 p-2 bg-gray-950/60 border border-gray-850 rounded-xl">
+                    <img 
+                      src={imageUrl} 
+                      className="w-12 h-12 object-cover rounded-lg border border-gray-800" 
+                      alt="Preview"
+                      onError={(e) => {
+                        e.target.src = DEFAULT_GENERIC_IMAGE;
+                      }}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] font-bold text-gray-400 truncate">IMAGE COUPLING READY</p>
+                      <p className="text-[9px] text-gray-600 truncate font-mono">{imageUrl}</p>
+                    </div>
+                    <button 
+                      type="button" 
+                      onClick={() => setImageUrl('')} 
+                      className="text-gray-500 hover:text-red-500 text-xs font-black p-1 cursor-pointer"
+                      title="Clear Image"
+                    >
+                      ×
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div>

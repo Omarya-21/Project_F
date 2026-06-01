@@ -412,7 +412,7 @@ export default function ProductsAdmin() {
                 {/* Direct URL entry */}
                 <div>
                   <input 
-                    type="url" 
+                    type="text" 
                     placeholder="Paste image web URL manually" 
                     className="w-full bg-black border border-gray-800/80 rounded-xl p-3 text-white text-xs focus:ring-1 focus:ring-blue-500 outline-none font-mono"
                     value={imageUrl}
